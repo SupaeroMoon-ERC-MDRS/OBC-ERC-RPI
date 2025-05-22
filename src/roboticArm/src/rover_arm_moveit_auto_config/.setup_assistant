@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: rover_arm_description
+    relative_path: urdf/robot_simple.urdf
+  srdf:
+    relative_path: config/my_robot_arm.srdf
+  package_settings:
+    author_name: lucas
+    author_email: lucas.alba@student.isae-supaero.fr
+    generated_timestamp: 1747836776
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

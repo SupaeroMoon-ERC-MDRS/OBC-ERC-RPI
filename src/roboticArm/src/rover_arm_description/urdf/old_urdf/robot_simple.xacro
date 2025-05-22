@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_robot_arm">
+
+  <!-- Properties -->
+  <xacro:property name="base_height" value="0.0555"/>
+  <xacro:property name="B1_height" value="0.02"/>
+  <xacro:property name="B2_height" value="0.102"/>
+  <xacro:property name="arm_inf_height" value="0.228"/>
+  <xacro:property name="arm_sup_height" value="0.170"/>
+  <xacro:property name="gripper_length" value="0.1"/>
+  <xacro:property name="link_radius" value="0.05"/>
+
+  <!-- Materials -->
+  <material name="blue">
+    <color rgba="0.0 0.0 1.0 1.0"/>
+  </material>
+  <material name="red">
+    <color rgba="1.0 0.0 0.0 1.0"/>
+  </material>
+  <material name="gray">
+    <color rgba="0.5 0.5 0.5 1.0"/>
+  </material>
+
+  <link name="world"/>
+
+  <joint name="ground" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- Base Link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.08" length="${base_height}"/>
+      </geometry>
+      <!-- <geometry>
+          <mesh filename="file://C:/Users/luc24/Desktop/SUPAEROMOON/Robotic%20Arm/ROS/install/rover_arm_description/share/rover_arm_description/urdf/obj/base.stl" scale="1 1 1"/>
+      </geometry> -->
+      <material name="gray"/>
+      <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.08" length="${base_height}"/>
+      </geometry>
+      <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 ${base_height/2}"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="joint1" type="fixed">
+    <parent link="base_link"/>
+    <child link="B1_fixe"/>
+    <origin xyz="0 0 ${base_height}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- First Link -->
+  <link name="B1_fixe">
+    <visual>
+      <geometry>
+        <cylinder radius="${link_radius}" length="${B1_height}"/>
+      </geometry>
+      <material name="blue"/>
+      <origin xyz="0 0 ${B1_height/2}" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${link_radius}" length="${B1_height}"/>
+      </geometry>
+      <origin xyz="0 0 ${B1_height/2}" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.01"/>
+      <origin xyz="0 0 ${B1_height/2}"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint2" type="revolute">
+    <parent link="B1_fixe"/>
+    <child link="B2"/>
+    <origin xyz="0 0 ${B1_height}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="B2">
+    <visual>
+      <geometry>
+        <cylinder radius="${link_radius}" length="${B2_height}"/>
+      </geometry>
+      <material name="red"/>
+      <origin xyz="0 0 ${B2_height/2}" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${link_radius}" length="${B2_height}"/>
+      </geometry>
+      <origin xyz="0 0 ${B2_height/2}" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 ${B2_height/2}"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.000001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint3" type="revolute">
+    <parent link="B2"/>
+    <child link="arm_inf"/>
+    <origin xyz="0 0 ${B2_height}" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="arm_inf">
+    <visual>
+      <geometry>
+        <box size="0.05 0.05 ${arm_inf_height}"/>
+      </geometry>
+      <material name="blue"/>
+      <origin xyz="0 0 ${arm_inf_height/2}" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.05 0.05 ${arm_inf_height}"/>
+      </geometry>
+      <origin xyz="0 0 ${arm_inf_height/2}" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 ${arm_inf_height/2}"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint4" type="revolute">
+    <parent link="arm_inf"/>
+    <child link="arm_sup"/>
+    <origin xyz="0 0 ${arm_inf_height}" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="arm_sup">
+    <visual>
+      <geometry>
+        <box size="0.05 0.05 ${arm_sup_height}"/>
+      </geometry>
+      <material name="red"/>
+      <origin xyz="0 0 ${arm_sup_height/2}" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.05 0.05 ${arm_sup_height}"/>
+      </geometry>
+      <origin xyz="0 0 ${arm_sup_height/2}" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <origin xyz="0 0 ${arm_sup_height/2}"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint5" type="revolute">
+    <parent link="arm_sup"/>
+    <child link="gripper"/>
+    <origin xyz="0 0 ${arm_sup_height}" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="10.0" velocity="1.0" lower="-1.57" upper="1.57"/>
+  </joint>
+
+  <link name="gripper">
+    <visual>
+      <geometry>
+        <box size="0.05 0.05 ${gripper_length}"/>
+      </geometry>
+      <material name="gray"/>
+      <origin xyz="0 0 ${gripper_length/2}" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.05 0.05 ${gripper_length}"/>
+      </geometry>
+      <origin xyz="0 0 ${gripper_length/2}" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 ${gripper_length/2}"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+</robot> 
