@@ -1,8 +1,9 @@
 #basic telemetry node with examples for Odometry from encoder_node
 
-from udpcanpy import NetworkHandler, RemoteControl #to access the UPDCAN protocol
+from udpcanpy import NetworkHandler, RemoteControl, NavOdometry #to access the UPDCAN protocol
 import rclpy
 from rclpy.node import Node
+import numpy as np
 
 from std_msgs.msg import Float64, Bool
 from nav_msgs.msg import Odometry
@@ -43,7 +44,7 @@ class TelemNode(Node):
 
         ## sample implementation with encoder odometry
         self.odom_wrap = self.nh.getOdometry() #need to check message definition with Dávid
-        self.odomess = OdometryMessage()
+        self.odomess = NavOdometry()
 
     def rec_telem(self):
         self.telem_data = self.telem_sub.read() #get telemetry data from subscriber
@@ -70,15 +71,16 @@ class TelemNode(Node):
         self.nh.flush() #ask David for condition 
 
     def send_odom(self):
-        self.odomess.x = self.x_pos
-        self.odomess.y = self.y_pos
-        self.odomess.z = self.z_pos
-        self.odomess.orientation = self.orientation
-        self.odomess.x_twist = self.x_twist
-        self.odomess.z_twist = self.z_twist
+        self.odomess.distance = np.sqrt(self.x_pos**2 + self.y_pos**2 + self.z_pos**2)
+        self.odomess.speed = self.x_twist
+
+        self.odomess.joint_0 = self.orientation.x
+        self.odomess.joint_1 = self.orientation.y
+        self.odomess.joint_2 = self.orientation.z
+        self.odomess.joint_3 = self.orientation.w
 
         self.odom_wrap.update(self.odomess)
-        self.nh.pushOdometry()
+        self.nh.pushNavOdometry()
         self.nh.flush()
 
 def main(args=None):
