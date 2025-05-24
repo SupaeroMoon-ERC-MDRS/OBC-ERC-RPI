@@ -3,11 +3,11 @@
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
 
     <ros2_control name="RobotSystem" type="system">
-        <hardware>
-            <xacro:if value="${use_gazebo}">
+        <!-- <hardware>
+            <xacro:if value="$(arg use_gazebo)">
                 <plugin>gazebo_ros2_control/GazeboSystem</plugin>
             </xacro:if>
-        </hardware>
+        </hardware> -->
  
         <joint name="joint2">
             <command_interface name="position">
