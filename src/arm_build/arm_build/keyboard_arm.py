@@ -26,21 +26,21 @@ class KeyboardTeleopNode(Node):
                 self.publish_twist([0.0, 1.0, 0.0, 0.0, 0.0, 0.0])
             elif key == 'd':
                 self.publish_twist([0.0, -1.0, 0.0, 0.0, 0.0, 0.0])
-            elif key == 'r':
+            elif key == 'r': # Gripper open
                 self.publish_twist([0.0, 0.0, 1.0, 0.0, 0.0, 0.0])
-            elif key == 'f':
+            elif key == 'f': # Gripper Close
                 self.publish_twist([0.0, 0.0, -1.0, 0.0, 0.0, 0.0])
-            elif key == 't':
+            elif key == 't': # Base +ve
                 self.publish_twist([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
-            elif key == 'g':
+            elif key == 'g': # Base -ve
                 self.publish_twist([0.0, 0.0, 0.0, -1.0, 0.0, 0.0])
-            elif key == 'y':
+            elif key == 'y': # wrist CW
                 self.publish_twist([0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
-            elif key == 'h':
+            elif key == 'h': # Wrist CCW
                 self.publish_twist([0.0, 0.0, 0.0, 0.0, -1.0, 0.0])
-            elif key == 'u':
+            elif key == 'u': # tilt Wrist
                 self.publish_twist([0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
-            elif key == 'j':
+            elif key == 'j': # tilt wrist
                 self.publish_twist([0.0, 0.0, 0.0, 0.0, 0.0, -1.0])
             elif key == 'q':
                 self.get_logger().info('Exiting...')
