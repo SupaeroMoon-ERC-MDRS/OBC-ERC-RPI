@@ -17,31 +17,31 @@ class KeyboardTeleopNode(Node):
         while rclpy.ok():
             key = self.get_key()
             if key == 'a': 
-                self.publish_twist([0, 0, 0, 0, 0, 0])
+                self.publish_twist([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             elif key == 'w':
-                self.publish_twist([1, 0, 0, 0, 0, 0])
+                self.publish_twist([1.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             elif key == 's':
-                self.publish_twist([-1, 0, 0, 0, 0, 0])
+                self.publish_twist([-1.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             elif key == 'e':
-                self.publish_twist([0, 1, 0, 0, 0, 0])
+                self.publish_twist([0.0, 1.0, 0.0, 0.0, 0.0, 0.0])
             elif key == 'd':
-                self.publish_twist([0, -1, 0, 0, 0, 0])
+                self.publish_twist([0.0, -1.0, 0.0, 0.0, 0.0, 0.0])
             elif key == 'r':
-                self.publish_twist([0, 0, 1, 0, 0, 0])
+                self.publish_twist([0.0, 0.0, 1.0, 0.0, 0.0, 0.0])
             elif key == 'f':
-                self.publish_twist([0, 0, -1, 0, 0, 0])
+                self.publish_twist([0.0, 0.0, -1.0, 0.0, 0.0, 0.0])
             elif key == 't':
-                self.publish_twist([0, 0, 0, 1, 0, 0])
+                self.publish_twist([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
             elif key == 'g':
-                self.publish_twist([0, 0, 0, -1, 0, 0])
+                self.publish_twist([0.0, 0.0, 0.0, -1.0, 0.0, 0.0])
             elif key == 'y':
-                self.publish_twist([0, 0, 0, 0, 1, 0])
+                self.publish_twist([0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
             elif key == 'h':
-                self.publish_twist([0, 0, 0, 0, -1, 0])
+                self.publish_twist([0.0, 0.0, 0.0, 0.0, -1.0, 0.0])
             elif key == 'u':
-                self.publish_twist([0, 0, 0, 0, 0, 1])
+                self.publish_twist([0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
             elif key == 'j':
-                self.publish_twist([0, 0, 0, 0, 0, -1])
+                self.publish_twist([0,.0 0,.0 0,.0 0,.0 0,.0 -1.0])
             elif key == 'q':
                 self.get_logger().info('Exiting...')
                 break
