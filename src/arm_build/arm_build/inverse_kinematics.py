@@ -35,12 +35,12 @@ class IKServoController(Node):
         self.pca.frequency = 50
 
         # Create servo objects
-        self.base = servo.Servo(self.pca.channels[4], min_pulse=500, max_pulse=2500)
-        self.theta_1 = servo.Servo(self.pca.channels[5], min_pulse=500, max_pulse=2500)
-        self.theta_2 = servo.Servo(self.pca.channels[6], min_pulse=500, max_pulse=2500)
-        self.wrist_link = servo.Servo(self.pca.channels[7], min_pulse=500, max_pulse=2500)
-        self.wrist_rot = servo.Servo(self.pca.channels[8], min_pulse=500, max_pulse=2500)
-        self.gripper = servo.Servo(self.pca.channels[9], min_pulse=500, max_pulse=2500)
+        self.base = servo.Servo(self.pca.channels[8], min_pulse=500, max_pulse=2500)
+        self.theta_1 = servo.Servo(self.pca.channels[9], min_pulse=500, max_pulse=2500)
+        self.theta_2 = servo.Servo(self.pca.channels[10], min_pulse=500, max_pulse=2500)
+        self.wrist_link = servo.Servo(self.pca.channels[11], min_pulse=500, max_pulse=2500)
+        self.wrist_rot = servo.Servo(self.pca.channels[4], min_pulse=500, max_pulse=2500)
+        self.gripper = servo.Servo(self.pca.channels[5], min_pulse=500, max_pulse=2500)
         
 
         # # Delete this to test physically
@@ -109,7 +109,7 @@ class IKServoController(Node):
 
     def send_to_servo(self, q1, servo1):
         # Convert radians to degrees and map to servo angle range
-        a1 = math.degrees(q1)
+        a1 = math.degrees(q1) * 180 / 300
 
         # Clamp to [0, 180] as needed for hobby servos
         a1 = max(0, min(180, 90 + a1))  # Offset for center position
