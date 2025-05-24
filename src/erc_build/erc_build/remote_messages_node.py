@@ -1,6 +1,6 @@
 ## To create a ROS node to process incoming messages from the remote control
 """To be tested"""
-from udpcanpy import NetworkHandler, RemoteControl #to access the UPDCAN protocol
+from udpcanpy import NetworkHandler, RemoteControl, NavOdometry #to access the UPDCAN protocol
 import rclpy
 from rclpy.node import Node
 
@@ -28,9 +28,9 @@ class RemoteComms(Node):
 
         ## Create subscriptions and publishers
         self.cmd_vel_pub = self.create_publisher(msg_type=Twist,topic="/cmd_vel",qos_profile=10)
-        self.cmd_arm_motion_pub = self.create_publisher(msg_type=Quaternion,topic="/cmd_move_arm",qos_profile=10)
-        self.cmd_arm_grip_pub = self.create_publisher(msg_type=Bool,topic="/cmd_grip_arm",qos_profile=10)
-        self.telem_sub = self.create_subscription(msg_type=Float64,topic="/telemetry",qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
+        self.cmd_arm_motion_pub = self.create_publisher(msg_type=Twist,topic="/cmd_move_arm",qos_profile=10)
+        #self.cmd_arm_grip_pub = self.create_publisher(msg_type=Bool,topic="/cmd_grip_arm",qos_profile=10)
+        self.odom_sub = self.create_subscription(msg_type=Odometry,topic="/odom",callback = self.rec_odom ,qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
         """The queue size has been set to 10 for now, but it can be changed as necessary"""
         
         ## Next step is to create interface with comms protocol to get remote input and store it for the node to publish
@@ -60,14 +60,11 @@ class RemoteComms(Node):
 
         self.remote = self.nh.getRemoteControl() #This creates the higher order structure that contains the data we need to access - MessageWrapper equivalent, I think
         self.data = RemoteControl() #object to eventually store the message data when accessed
+
+        self.odom_wrap = self.nh.getNavOdometry() #need to check message definition with Dávid
+        self.odomess = NavOdometry()
         
         self.e_stop = False #creating emergency stop attribute so that we know when that's been pressed
-
-        """Trying to integrate telemetry"""
-        self.telem_target = self.nh.getTelemWrap() #higher order structure for telem messages
-        self.telemessage = TelemMessage() #telem message object - still needs to be defined - might need several - can write to this object
-        
-
 
 
         """Q to ask: When writing in ROS, does everything that would otherwise be a regular variable, now become an attribute? - yes, for now"""
@@ -96,7 +93,6 @@ class RemoteComms(Node):
         self.end_theta = 0.0 #gripper (end-vector) rotation
         self.end_grip = False #gripper grab or not
 
-        """Q for Emma - do I create a timer? - yes"""
         # Timer to run remote input method repeatedly once the Node is initialised
         self.timer = self.create_timer(0.2,self.remote_input)
 
@@ -132,21 +128,20 @@ class RemoteComms(Node):
 
                 # self.get_logger().error(f"Arm mode? {self.arm_mode}")
 
-                # if self.L1 and self.R1:
-                #     if [self.L1,self.R1] != self.prev_toggle:
-                #         self.arm_mode = not self.arm_mode
+                # Mode toggle
+                if self.L1 and self.R1:
+                    if [self.L1,self.R1] != self.prev_toggle:
+                        self.arm_mode = not self.arm_mode
                 
-                #self.prev_toggle = [self.L1,self.R1]
+                self.prev_toggle = [self.L1,self.R1]
 
-                if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd:
-                    self.rover_command()
+                if not self.arm_mode:
+                    if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd:
+                        self.rover_command()
+                        self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
+                elif self.arm_mode:
+                    self.arm_command()
 
-                # if not self.arm_mode:
-                #     self.rover_command()
-                # elif self.arm_mode:
-                #     self.arm_command()
-
-                self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
 
     def __repr__(self):
         return (f"=================\n\
@@ -218,12 +213,15 @@ class RemoteComms(Node):
         self.cmd_vel_pub.publish(rov_cmd)
 
     def arm_command(self):
- 
+        
+        arm_cmd = Twist()
+
         self.arm_x = 0.0 #forward/back
-        self.arm_z = 0.0 #up/down
+        self.arm_y = 0.0 #up/down
+        self.end_grip = 0.0 #gripper open/close
         self.arm_theta = 0.0 #arm swivel
-        self.end_theta = 0.0 #gripper (end-vector) rotation
-        self.end_grip = False #gripper grab or not
+        self.wrist_theta = 0.0 #wrist rotation
+        self.last_link = 0.0 #last link (wrist up/down?)
 
         # Left analog stick up/down for forward/back
         if self.ThumbLY <= 5:
@@ -232,47 +230,52 @@ class RemoteComms(Node):
             self.arm_x = -1.0
         # Right analog stick up/down for up/down
         if self.ThumbRY <= 5:
-            self.arm_z = 1.0
+            self.arm_y = 1.0
         elif self.ThumbRY >= 250:
-            self.arm_z = -1.0
+            self.arm_y = -1.0
+        # X and ∆ buttons on right for gripper closed/open
+        if self.RT:
+            self.end_grip = 1.0
+        elif self.RB:
+            self.end_grip = -1.0
         # Left analog stick right/left for rotation
         if self.ThumbLX <= 5: #left
             self.arm_theta = 1.0 #positive usually means CCW by RH rule
         elif self.ThumbLX >= 250: #right
             self.arm_theta = -1.0
-        # up/down direction buttons on the left for wrist rotation
+        # Right analog stick right/left for wrist rotation
+        if self.ThumbRX <= 5: #
+            self.wrist_theta = 1.0 #
+        elif self.ThumbRX >= 250: #
+            self.wrist_theta = -1.0
+        # up/down direction buttons on the left for wrist up/down
         if self.LT:
-            self.end_theta = 1.0
+            self.last_link = 1.0
         elif self.LB:
-            self.end_theta = -1.0
-        # triangle button (right top) to grab
-        if self.RT:
-            self.end_grip = True
+            self.last_link = -1.0
 
         #print to debug
         self.get_logger().debug(f"arm commands to send: {self.arm_x, self.arm_z}")
-        # #stop button
-        if self.RB:
-            self.arm_x = 0.0
-            self.arm_z = 0.0 
+        # #stop button # R1
+        if self.R1:
+            self.arm_x = 0.0 #forward/back
+            self.arm_y = 0.0 
+            self.end_grip = 0.0 
             self.arm_theta = 0.0 
-            self.end_theta = 0.0 
-            self.end_grip = False
+            self.wrist_theta = 0.0 
+            self.last_link = 0.0
 
 
         #print to debug
         self.get_logger().debug(f"arm commands being sent: {self.arm_x,self.arm_z}")
 
-        arm_cmd = Quaternion()
-        arm_cmd.x = self.arm_x #x is forward/back
-        arm_cmd.z = self.arm_z #z is up/down
-        arm_cmd.y = self.arm_theta #y is rotation
-        arm_cmd.w = self.end_theta #w is wrist/end-vector joint position
+        arm_cmd.linear.x = self.arm_x #x is forward/back
+        arm_cmd.linear.y = self.arm_y #y is up/down
+        arm_cmd.linear.z = self.end_grip
+        arm_cmd.angular.x = self.arm_theta
+        arm_cmd.angular.y = self.wrist_theta
+        arm_cmd.angular.z = self.last_link
         self.cmd_arm_motion_pub.publish(arm_cmd)
-        if self.end_grip:
-            end_cmd = Bool()
-            end_cmd.data = self.end_grip
-            self.cmd_arm_grip_pub.publish(end_cmd)
 
     
     def emergency_stop(self, direct = True):
@@ -294,6 +297,31 @@ class RemoteComms(Node):
         self.telemessage.variable = telem_data
         self.telem_target.update(self.telemessage)
         self.nh.pushTelemMessage()
+        self.nh.flush()
+
+    def rec_odom(self):
+        odom_now = self.odom_sub.read()
+        self.x_pos = odom_now.pose.pose.position.x
+        self.y_pos = odom_now.pose.pose.position.y
+        self.z_pos = odom_now.pose.pose.position.z
+        self.orientation = odom_now.pose.pose.orientation
+
+        self.x_twist = odom_now.twist.twist.linear.x
+        self.z_twist = odom_now.twist.twist.angular.z
+
+        self.send_odom()
+    #will eventually combine these two methods, but keeping them separate for now for testing
+    def send_odom(self):
+        self.odomess.distance = np.sqrt(self.x_pos**2 + self.y_pos**2 + self.z_pos**2)
+        self.odomess.speed = self.x_twist
+
+        self.odomess.joint_0 = self.orientation.x
+        self.odomess.joint_1 = self.orientation.y
+        self.odomess.joint_2 = self.orientation.z
+        self.odomess.joint_3 = self.orientation.w
+
+        self.odom_wrap.update(self.odomess)
+        self.nh.pushNavOdometry()
         self.nh.flush()
 
 def main(args=None):

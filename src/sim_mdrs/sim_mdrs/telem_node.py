@@ -43,7 +43,7 @@ class TelemNode(Node):
         self.telemessage = TelemMessage() #telem message object - still needs to be defined - might need several - can write to this object
 
         ## sample implementation with encoder odometry
-        self.odom_wrap = self.nh.getOdometry() #need to check message definition with Dávid
+        self.odom_wrap = self.nh.getNavOdometry() #need to check message definition with Dávid
         self.odomess = NavOdometry()
 
     def rec_telem(self):
