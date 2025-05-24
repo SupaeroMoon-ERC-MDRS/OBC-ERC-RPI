@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: arm_build
+    relative_path: test/test_arm.urdf
+  srdf:
+    relative_path: config/my_robot_arm.srdf
+  package_settings:
+    author_name: Emma Seabrook
+    author_email: e.seabrook55@gmail.com
+    generated_timestamp: 1747993865
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

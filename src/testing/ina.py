@@ -6,6 +6,7 @@ pca = PCA9685(i2c, address = 0x43)
 ina260 = adafruit_ina260.INA260(i2c, address=0x40)
 
 pca.frequency = 50
+
 servo0 = servo.Servo(pca.channels[0])
 servo1 = servo.Servo(pca.channels[1])
 servo2 = servo.Servo(pca.channels[2])

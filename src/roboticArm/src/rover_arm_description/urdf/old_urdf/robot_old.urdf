@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<robot name="rover_arm">
+    <!-- Base Link (static base) -->
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 0.02" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.1" length="0.04"/>
+            </geometry>
+            <material name="black">
+                <color rgba="0.1 0.1 0.1 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.02" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.1" length="0.04"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 0.02" rpy="0 0 0"/>
+            <mass value="0.650"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+        </inertial>
+    </link>
+
+    <!-- Base rotation joint (Z-axis) -->
+    <joint name="base_rotation" type="revolute">
+        <parent link="base_link"/>
+        <child link="base_rotation_link"/>
+        <origin xyz="0 0 0.04" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="-3.14159" upper="3.14159" effort="100" velocity="1.0"/>
+    </joint>
+
+    <!-- Rotating base link -->
+    <link name="base_rotation_link">
+        <visual>
+            <origin xyz="0 0 0.0682" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.05" length="0.1364"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.0682" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.05" length="0.1364"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 0.0682" rpy="0 0 0"/>
+            <mass value="0.650"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+        </inertial>
+    </link>
+
+    <!-- First arm joint (Y-axis) -->
+    <joint name="joint1" type="revolute">
+        <parent link="base_rotation_link"/>
+        <child link="link1"/>
+        <origin xyz="0 0 0.1364" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.5708" upper="1.5708" effort="100" velocity="1.0"/>
+    </joint>
+
+    <!-- Link 1 -->
+    <link name="link1">
+        <visual>
+            <origin xyz="0.0876 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.1752 0.05 0.05"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0.0876 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.1752 0.05 0.05"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.0876 0 0" rpy="0 0 0"/>
+            <mass value="0.220"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+        </inertial>
+    </link>
+
+    <!-- Second arm joint (Y-axis) -->
+    <joint name="joint2" type="revolute">
+        <parent link="link1"/>
+        <child link="link2"/>
+        <origin xyz="0.1752 0 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.5708" upper="1.5708" effort="100" velocity="1.0"/>
+    </joint>
+
+    <!-- Link 2 -->
+    <link name="link2">
+        <visual>
+            <origin xyz="0.0804 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.1608 0.05 0.05"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0.0804 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.1608 0.05 0.05"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.0804 0 0" rpy="0 0 0"/>
+            <mass value="0.200"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+        </inertial>
+    </link>
+
+    <!-- Third arm joint (Y-axis) -->
+    <joint name="joint3" type="revolute">
+        <parent link="link2"/>
+        <child link="link3"/>
+        <origin xyz="0.1608 0 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.5708" upper="1.5708" effort="100" velocity="1.0"/>
+    </joint>
+
+    <!-- Link 3 -->
+    <link name="link3">
+        <visual>
+            <origin xyz="0.1091 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.2182 0.05 0.05"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <origin xyz="0.1091 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.2182 0.05 0.05"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.1091 0 0" rpy="0 0 0"/>
+            <mass value="0.250"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+        </inertial>
+    </link>
+
+    <!-- End effector -->
+    <link name="end_effector">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="0.140"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+        </inertial>
+    </link>
+
+    <joint name="end_effector_joint" type="fixed">
+        <parent link="link3"/>
+        <child link="end_effector"/>
+        <origin xyz="0.2182 0 0" rpy="0 0 0"/>
+    </joint>
+</robot> 
