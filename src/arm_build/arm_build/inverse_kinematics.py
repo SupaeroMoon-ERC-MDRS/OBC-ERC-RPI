@@ -105,12 +105,12 @@ class IKServoController(Node):
             return None
         q2 = math.acos(d)
         q1 = math.atan2(y, x) - math.atan2(self.l2 * math.sin(q2), self.l1 + self.l2 * math.cos(q2))
+        q1 = math.degrees(q1)
+        q2 = math.degrees(q2)
         return q1, q2
 
     def send_to_servo(self, q1, servo1):
-        # Convert radians to degrees and map to servo angle range
-        a1 = math.degrees(q1) * 180 / 300
-
+        a1 = q1 *180/ 300
         # Clamp to [0, 180] as needed for hobby servos
         a1 = max(0, min(180, a1))  # Offset for center position
 
