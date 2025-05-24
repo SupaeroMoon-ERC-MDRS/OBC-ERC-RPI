@@ -6,6 +6,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import Float64, Bool
 from geometry_msgs.msg import Twist, Quaternion
+from nav_msgs.msg import Odometry
 
 class StopWorthyException(Exception):
     "Raised for crucial failures"
