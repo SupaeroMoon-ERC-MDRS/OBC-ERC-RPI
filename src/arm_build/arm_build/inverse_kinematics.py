@@ -20,7 +20,7 @@ class IKServoController(Node):
         self.theta_2_curr = 0.0
         self.wrist_link_curr = 0.0
         self.wrist_rot_curr = 0.0
-        self.gripper_curr = 0.0
+        self.gripper_curr = 90.0
 
         self.subscription = self.create_subscription(
             Twist,
