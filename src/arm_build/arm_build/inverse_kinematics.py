@@ -13,8 +13,8 @@ class IKServoController(Node):
     def __init__(self):
         super().__init__('inverse_kinematics')
 
-        self.current_x = 0.0
-        self.current_y = 0.5 # Total height of arm goes here
+        self.current_x = 0.2
+        self.current_y = 0.3 # Total height of arm goes here
         self.base_curr = 0.0
         self.theta_1_curr = 0.0
         self.theta_2_curr = 0.0
@@ -89,12 +89,12 @@ class IKServoController(Node):
             self.send_to_servo(self.base_curr, self.base)
 
         if abs(msg.angular.y) > 1e-4: # tilt arm
-            dtheta = msg.angular.x * 0.5
+            dtheta = msg.angular.y * 0.5
             self.wrist_rot_curr += dtheta
             self.send_to_servo(self.wrist_rot_curr, self.wrist_rot)
 
         if abs(msg.angular.z) > 1e-4: # rotate wrist
-            dtheta = msg.angular.x * 0.5
+            dtheta = msg.angular.z * 0.5
             self.wrist_link_curr += dtheta
             self.send_to_servo(self.wrist_link_curr, self.wrist_link)
 
