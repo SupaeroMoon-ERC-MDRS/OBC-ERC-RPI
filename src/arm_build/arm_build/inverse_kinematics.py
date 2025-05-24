@@ -112,7 +112,7 @@ class IKServoController(Node):
         a1 = math.degrees(q1) * 180 / 300
 
         # Clamp to [0, 180] as needed for hobby servos
-        a1 = max(0, min(180, 90 + a1))  # Offset for center position
+        a1 = max(0, min(180, a1))  # Offset for center position
 
         self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
         servo1.angle = a1
