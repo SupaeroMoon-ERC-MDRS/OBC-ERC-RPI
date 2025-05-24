@@ -3,7 +3,7 @@
 
   <gazebo>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-      <parameters>$(find arm_build)/config/arm_control.yaml</parameters>
+      <parameters>$(find erc_build)/config/arm_control.yaml</parameters>
     </plugin>
   </gazebo>
 

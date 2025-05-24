@@ -36,11 +36,11 @@ After executing this, you should see two windows open. One allows you to control
 
 To start the simulation, execute the following command inside a first terminal
 ```
-ros2 launch rover_arm_description demo.launch.py
+ros2 launch rover_arm_moveit_auto_config demo.launch.py
 ```
 Inside a second terminal, use this command
 ```
-ros2 launch rover_arm_description move_group.launch.py
+ros2 launch rover_arm_moveit_auto_config move_group.launch.py
 ```
 
 After this, you sould have an Rivz windows that appear. Inside, the robotic arm should be visible, with a panel named "MotionPlanning" on the rigth.
