@@ -41,7 +41,7 @@ class KeyboardTeleopNode(Node):
             elif key == 'u':
                 self.publish_twist([0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
             elif key == 'j':
-                self.publish_twist([0,.0 0,.0 0,.0 0,.0 0,.0 -1.0])
+                self.publish_twist([0.0, 0.0, 0.0, 0.0, 0.0, -1.0])
             elif key == 'q':
                 self.get_logger().info('Exiting...')
                 break
