@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<robot name="custom_arm" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Base Link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.02"/>
+      </geometry>
+      <material name="gray"><color rgba="0.5 0.5 0.5 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Joint A -->
+  <joint name="joint_0" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.01" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="link_1">
+    <visual>
+      <geometry>
+        <cylinder radius="0.03" length="0.1364"/>
+      </geometry>
+      <origin xyz="0 0 0.0682" rpy="0 0 0"/>
+      <material name="blue"><color rgba="0.0 0.3 0.6 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Joint B -->
+  <joint name="joint_1" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 0.1364" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="link_2">
+    <visual>
+      <geometry>
+        <box size="0.02 0.02 0.1752"/>
+      </geometry>
+      <origin xyz="0 0 0.0876" rpy="0 0 0"/>
+      <material name="orange"><color rgba="1 0.5 0 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Joint C -->
+  <joint name="joint_2" type="revolute">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin xyz="0 0 0.1752" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="link_3">
+    <visual>
+      <geometry>
+        <box size="0.02 0.02 0.1609"/>
+      </geometry>
+      <origin xyz="0 0 0.0804" rpy="0 0 0"/>
+      <material name="red"><color rgba="0.8 0.2 0.2 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Joint D -->
+  <joint name="joint_3" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <origin xyz="0 0 0.1609" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="link_4">
+    <visual>
+      <geometry>
+        <box size="0.02 0.02 0.2182"/>
+      </geometry>
+      <origin xyz="0 0 0.1091" rpy="0 0 0"/>
+      <material name="green"><color rgba="0.2 0.8 0.2 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Joint E -->
+  <joint name="joint_4" type="revolute">
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <origin xyz="0 0 0.2182" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/> <!-- rotation dans l'axe Z -->
+    <limit lower="-3.14" upper="3.14" effort="10" velocity="1"/>
+  </joint>
+
+  <link name="link_5">
+    <visual>
+      <geometry>
+        <cylinder radius="0.015" length="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025" rpy="0 0 0"/>
+      <material name="purple"><color rgba="0.6 0 0.8 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Fixed joint for gripper -->
+  <joint name="joint_gripper_base" type="fixed">
+    <parent link="link_5"/>
+    <child link="link_gripper_base"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+  </joint>
+
+  <link name="link_gripper_base">
+    <visual>
+      <geometry>
+        <box size="0.06 0.02 0.02"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="gray"><color rgba="0.4 0.4 0.4 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Prismatic Joint: Finger Left -->
+  <joint name="joint_finger_left" type="prismatic">
+    <parent link="link_gripper_base"/>
+    <child link="link_finger_left"/>
+    <origin xyz="0.01 0 0.025" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0.0" upper="0.02" effort="5.0" velocity="0.05"/>
+  </joint>
+
+  <link name="link_finger_left">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.04"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="darkgray"><color rgba="0.2 0.2 0.2 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Prismatic Joint: Finger Right -->
+  <joint name="joint_finger_right" type="prismatic">
+    <parent link="link_gripper_base"/>
+    <child link="link_finger_right"/>
+    <origin xyz="-0.01 0 0.025" rpy="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit lower="0.0" upper="0.02" effort="5.0" velocity="0.05"/>
+  </joint>
+
+  <link name="link_finger_right">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.04"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="darkgray"><color rgba="0.2 0.2 0.2 1"/></material>
+    </visual>
+  </link>
+
+</robot>
