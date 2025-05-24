@@ -7,7 +7,7 @@ import tty
 
 class KeyboardTeleopNode(Node):
     def __init__(self):
-        super().__init__('keyboard_teleop_full_twist')
+        super().__init__('keyboard_arm')
         self.publisher_ = self.create_publisher(Twist, '/cmd_vel', 10)
         self.get_logger().info('Keyboard Teleop Node Started')
         self.run()
@@ -69,6 +69,14 @@ class KeyboardTeleopNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = KeyboardTeleopNode()
-    node.destroy_node()
-    rclpy.shutdown()
+    keyboard_arm = KeyboardTeleopNode()
+    try:
+        rclpy.spin(keyboard_arm)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        keyboard_arm.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

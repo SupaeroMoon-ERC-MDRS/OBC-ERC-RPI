@@ -28,9 +28,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'servo_command_node = servo_command_node:main',
-            'inverse_kinematics = inverse_kinematics:main',
-            'keyboard_arm = keyboard_arm:main',
+            'servo_command_node = arm_build.servo_command_node:main',
+            'inverse_kinematics = arm_build.inverse_kinematics:main',
+            'keyboard_arm = arm_build.keyboard_arm:main',
         ],
     },
 )

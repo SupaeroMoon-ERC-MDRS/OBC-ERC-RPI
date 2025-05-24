@@ -11,7 +11,7 @@ import busio
 
 class IKServoController(Node):
     def __init__(self):
-        super().__init__('ik_servo_controller')
+        super().__init__('inverse_kinematics')
 
         self.current_x = 0.0
         self.current_y = 0.5 # Total height of arm goes here
@@ -119,7 +119,14 @@ class IKServoController(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = IKServoController()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    inv_kin = IKServoController()
+    try:
+        rclpy.spin(inv_kin)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        inv_kin.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
