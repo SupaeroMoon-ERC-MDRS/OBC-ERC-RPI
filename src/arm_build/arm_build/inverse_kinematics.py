@@ -115,7 +115,7 @@ class IKServoController(Node):
         a1 = max(0, min(180, 90 + a1))  # Offset for center position
 
         self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
-        #servo1.angle = a1
+        servo1.angle = a1
 
 def main(args=None):
     rclpy.init(args=args)
