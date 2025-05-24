@@ -78,23 +78,23 @@ class IKServoController(Node):
                 self.get_logger().warn(f"Unreachable target: ({new_x:.2f}, {new_y:.2f})")
         
         if abs(msg.linear.z) > 1e-4: # open/close grip
-            dz = msg.linear.z * 0.01
+            dz = msg.linear.z * 0.5
             self.gripper_curr += dz
             self.send_to_servo(self.gripper_curr, self.gripper)
             # TODO: Implement servo limits
 
         if abs(msg.angular.x) > 1e-4: # rotate base
-            dtheta = msg.angular.x * 0.01
+            dtheta = msg.angular.x * 0.5
             self.base_curr += dtheta
             self.send_to_servo(self.base_curr, self.base)
 
         if abs(msg.angular.y) > 1e-4: # rotate arm
-            dtheta = msg.angular.y * 0.01
+            dtheta = msg.angular.y * 0.5
             self.wrist_rot_curr += dtheta
             self.send_to_servo(self.wrist_rot_curr, self.wrist_rot)
 
         if abs(msg.angular.z) > 1e-4: # tilt wrist
-            dtheta = msg.angular.z * 0.01
+            dtheta = msg.angular.z * 0.5
             self.wrist_link_curr += dtheta
             self.send_to_servo(self.wrist_link_curr, self.wrist_link)
 
