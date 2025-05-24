@@ -55,7 +55,7 @@ class KeyboardTeleopNode(Node):
         twist.angular.y = values[4]
         twist.angular.z = values[5]
         self.publisher_.publish(twist)
-        self.get_logger().info(f'Published Twist: {values:+}')
+        self.get_logger().info(f'Published Twist: {values}')
 
     def get_key(self):
         fd = sys.stdin.fileno()
