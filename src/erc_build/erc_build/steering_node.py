@@ -14,6 +14,7 @@ class SixWheelFourWSController(Node):
         super().__init__('six_wheel_fourws_controller')
         self.cmd_sub = self.create_subscription(Twist, 'cmd_vel', self.cmd_vel_callback, 1)
         self.wheel_pub = self.create_publisher(Float64MultiArray, '/wheel_controller/commands', 1)
+        self.get_logger().info('Six Wheel Four Wheel Steering Controller Node initialized.')
 
     def cmd_vel_callback(self, msg):
         linear_vel = msg.linear.x
@@ -46,6 +47,7 @@ class SixWheelFourWSController(Node):
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = linear_vel
 
         # Fill message in specified format
+        self.get_logger().info(f"Publishing wheel commands: FL={angle_fl}, FR={angle_fr}, RL={angle_rl}, RR={angle_rr}, Vel={linear_vel}")
         cmd.data = [
             vel_fl, angle_fl,
             vel_fr, angle_fr,
