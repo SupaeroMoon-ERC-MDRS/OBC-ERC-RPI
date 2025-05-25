@@ -25,9 +25,9 @@ class SixWheelFourWSController(Node):
 
         # Default: no turning → all angles = 0
         angle_fl = 43.0 #2
-        angle_fr = 257.0 #1
-        angle_rl = 253.0 #3
-        angle_rr = 46.0 #0
+        angle_fr = 255.0 #1
+        angle_rl = 251.0 #3
+        angle_rr = 44.0 #0
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = 0.0
 
         if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-5:
