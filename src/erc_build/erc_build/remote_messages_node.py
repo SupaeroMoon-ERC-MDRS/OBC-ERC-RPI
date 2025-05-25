@@ -1,8 +1,9 @@
 ## To create a ROS node to process incoming messages from the remote control
 """To be tested"""
-from udpcanpy import NetworkHandler, RemoteControl, NavOdometry #to access the UPDCAN protocol
+from udpcanpy import NetworkHandler, RemoteControl, NavOdometry, RaspiState #to access the UPDCAN protocol
 import rclpy
 from rclpy.node import Node
+from raspistatechecker import RaspiStateChecker
 
 from std_msgs.msg import Float64, Bool
 from geometry_msgs.msg import Twist, Quaternion
@@ -64,6 +65,10 @@ class RemoteComms(Node):
 
         self.odom_wrap = self.nh.getNavOdometry() #need to check message definition with Dávid
         self.odomess = NavOdometry()
+
+        self.raspihandle = self.nh.getRaspiState()
+        self.raspi = RaspiState()
+        self.rsc = RaspiStateChecker()
         
         self.e_stop = False #creating emergency stop attribute so that we know when that's been pressed
 
@@ -323,6 +328,11 @@ class RemoteComms(Node):
 
         self.odom_wrap.update(self.odomess)
         self.nh.pushNavOdometry()
+        
+        if self.rsc.poll(self.raspi):
+            self.raspihandle.update(self.raspi)
+            self.nh.pushRaspiState()
+
         self.nh.flush()
 
 def main(args=None):
