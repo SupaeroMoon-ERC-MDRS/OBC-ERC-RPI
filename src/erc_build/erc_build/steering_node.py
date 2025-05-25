@@ -48,15 +48,15 @@ class SixWheelFourWSController(Node):
 
         elif abs(angular_vel) > 1e-5 and abs(linear_vel) <= 1e-5:
             # Wheels turned ±45° for in-place rotation
-            angle_fl = 45.0
-            angle_fr = -45.0
-            angle_rl = -45.0
-            angle_rr = 45.0
+            angle_fl = 10
+            angle_fr = 290
+            angle_rl = 290
+            angle_rr = 10
 
             # Set opposite velocities for left/right sides
             turning_speed = angular_vel * (TRACK_WIDTH / 2.0)  # or tweak as needed
-            vel_fl = vel_ml = vel_rl = -turning_speed
-            vel_fr = vel_mr = vel_rr = turning_speed
+            # vel_fl = vel_ml = vel_rl = -turning_speed
+            # vel_fr = vel_mr = vel_rr = turning_speed
 
         else:
             # Straight motion or no motion
