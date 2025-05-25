@@ -43,6 +43,8 @@ class SixWheelFourWSController(Node):
             angle_rl = math.degrees(math.atan(-WHEEL_BASE / radius_rl))  # rear steering typically opposite for tighter turns
             angle_rr = math.degrees(math.atan(-WHEEL_BASE / radius_rr))
 
+            self.logger.info(f"Calculated angles: FL={angle_fl}, FR={angle_fr}, RL={angle_rl}, RR={angle_rr}")
+
         # Calculate per-wheel velocities (approximate for now — same for all)
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = linear_vel
 
