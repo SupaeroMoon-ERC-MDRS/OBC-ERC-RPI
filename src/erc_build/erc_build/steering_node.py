@@ -46,7 +46,7 @@ class SixWheelFourWSController(Node):
 
             vel_fl = vel_fr = vel_ml = vel_mr = linear_vel
             vel_rl = vel_rr = -linear_vel
-            self.logger.info(f"Calculated angles: FL={angle_fl}, FR={angle_fr}, RL={angle_rl}, RR={angle_rr}")
+            self.get_logger().info(f"Calculated angles: FL={angle_fl}, FR={angle_fr}, RL={angle_rl}, RR={angle_rr}")
 
         elif abs(angular_vel) > 1e-5 and abs(linear_vel) <= 1e-5:
             # Wheels turned ±45° for in-place rotation
@@ -87,8 +87,9 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        pass
+        node.wheel_pub.publish([0.0] * 12)  # Stop all wheels on shutdown
     finally:
+        node.wheel_pub.publish([0.0] * 12)  # Stop all wheels on shutdown
         node.destroy_node()
         rclpy.shutdown()
 
