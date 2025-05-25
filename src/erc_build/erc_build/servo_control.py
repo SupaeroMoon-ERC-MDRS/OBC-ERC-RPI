@@ -26,10 +26,10 @@ class ServoSteeringNode(Node):
 
         # Setup four servos
         self.servos = {
-            'fl': servo.Servo(self.pca.channels[0], min_pulse=500, max_pulse=2500),  # front-left
+            'fl': servo.Servo(self.pca.channels[2], min_pulse=500, max_pulse=2500),  # front-left
             'fr': servo.Servo(self.pca.channels[1], min_pulse=500, max_pulse=2500),  # front-right
-            'rl': servo.Servo(self.pca.channels[2], min_pulse=500, max_pulse=2500),  # rear-left
-            'rr': servo.Servo(self.pca.channels[3], min_pulse=500, max_pulse=2500)   # rear-right
+            'rl': servo.Servo(self.pca.channels[3], min_pulse=500, max_pulse=2500),  # rear-left
+            'rr': servo.Servo(self.pca.channels[0], min_pulse=500, max_pulse=2500)   # rear-right
         }
 
         self.get_logger().info('Servo Steering Node initialized.')
