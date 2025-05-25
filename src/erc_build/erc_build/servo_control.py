@@ -43,10 +43,10 @@ class ServoSteeringNode(Node):
             angle_rr = msg.data[11]
 
             # Clamp and set angles
-            fl = self.clamp_angle(angle_fl) * 180/300
-            fr = self.clamp_angle(angle_fr) * 180/300
-            rl = self.clamp_angle(angle_rl) * 180/300
-            rr = self.clamp_angle(angle_rr) * 180/300
+            fl = self.clamp_angle(angle_fl * 180/300)
+            fr = self.clamp_angle(angle_fr * 180/300)
+            rl = self.clamp_angle(angle_rl * 180/300)
+            rr = self.clamp_angle(angle_rr * 180/300)
 
             self.get_logger().info(f'Setting angles: FL={fl}, FR={fr}, RL={rl}, RR={rr}')
 
