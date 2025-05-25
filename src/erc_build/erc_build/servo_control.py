@@ -43,10 +43,17 @@ class ServoSteeringNode(Node):
             angle_rr = msg.data[11]
 
             # Clamp and set angles
-            self.servos['fl'].angle = self.clamp_angle(angle_fl) * 180/300
-            self.servos['fr'].angle = self.clamp_angle(angle_fr) * 180/300
-            self.servos['rl'].angle = self.clamp_angle(angle_rl) * 180/300
-            self.servos['rr'].angle = self.clamp_angle(angle_rr) * 180/300
+            fl = self.clamp_angle(angle_fl) * 180/300
+            fr = self.clamp_angle(angle_fr) * 180/300
+            rl = self.clamp_angle(angle_rl) * 180/300
+            rr = self.clamp_angle(angle_rr) * 180/300
+
+            self.get_logger().info(f'Setting angles: FL={fl}, FR={fr}, RL={rl}, RR={rr}')
+
+            self.servos['fl'].angle = fl
+            self.servos['fr'].angle = fr
+            self.servos['rl'].angle = rl
+            self.servos['rr'].angle = rr
 
         except IndexError:
             self.get_logger().warn('Received malformed servo command message.')
