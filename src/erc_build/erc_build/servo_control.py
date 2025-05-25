@@ -26,10 +26,10 @@ class ServoSteeringNode(Node):
 
         # Setup four servos
         self.servos = {
-            'fl': servo.Servo(self.pca.channels[0]),  # front-left
-            'fr': servo.Servo(self.pca.channels[1]),  # front-right
-            'rl': servo.Servo(self.pca.channels[2]),  # rear-left
-            'rr': servo.Servo(self.pca.channels[3])   # rear-right
+            'fl': servo.Servo(self.pca.channels[0], min_pulse=500, max_pulse=2500),  # front-left
+            'fr': servo.Servo(self.pca.channels[1], min_pulse=500, max_pulse=2500),  # front-right
+            'rl': servo.Servo(self.pca.channels[2], min_pulse=500, max_pulse=2500),  # rear-left
+            'rr': servo.Servo(self.pca.channels[3], min_pulse=500, max_pulse=2500)   # rear-right
         }
 
         self.get_logger().info('Servo Steering Node initialized.')
@@ -43,10 +43,10 @@ class ServoSteeringNode(Node):
             angle_rr = msg.data[11]
 
             # Clamp and set angles
-            self.servos['fl'].angle = self.clamp_angle(angle_fl)
-            self.servos['fr'].angle = self.clamp_angle(angle_fr)
-            self.servos['rl'].angle = self.clamp_angle(angle_rl)
-            self.servos['rr'].angle = self.clamp_angle(angle_rr)
+            self.servos['fl'].angle = self.clamp_angle(angle_fl) * 180/300
+            self.servos['fr'].angle = self.clamp_angle(angle_fr) * 180/300
+            self.servos['rl'].angle = self.clamp_angle(angle_rl) * 180/300
+            self.servos['rr'].angle = self.clamp_angle(angle_rr) * 180/300
 
         except IndexError:
             self.get_logger().warn('Received malformed servo command message.')

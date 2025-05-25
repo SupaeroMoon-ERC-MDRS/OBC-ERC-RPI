@@ -23,7 +23,10 @@ class SixWheelFourWSController(Node):
         cmd = Float64MultiArray()
 
         # Default: no turning → all angles = 0
-        angle_fl = angle_fr = angle_rl = angle_rr = 0.0
+        angle_fl = 45
+        angle_fr = 255
+        angle_rl = 255
+        angle_rr = 45
 
         if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-5:
             turning_radius = linear_vel / angular_vel
@@ -34,10 +37,10 @@ class SixWheelFourWSController(Node):
             radius_rl = turning_radius - (TRACK_WIDTH / 2)
             radius_rr = turning_radius + (TRACK_WIDTH / 2)
 
-            angle_fl = math.atan(WHEEL_BASE / radius_fl)
-            angle_fr = math.atan(WHEEL_BASE / radius_fr)
-            angle_rl = math.atan(-WHEEL_BASE / radius_rl)  # rear steering typically opposite for tighter turns
-            angle_rr = math.atan(-WHEEL_BASE / radius_rr)
+            angle_fl = math.degrees(math.atan(WHEEL_BASE / radius_fl))
+            angle_fr = math.degrees(math.atan(WHEEL_BASE / radius_fr))
+            angle_rl = math.degrees(math.atan(-WHEEL_BASE / radius_rl))  # rear steering typically opposite for tighter turns
+            angle_rr = math.degrees(math.atan(-WHEEL_BASE / radius_rr))
 
         # Calculate per-wheel velocities (approximate for now — same for all)
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = linear_vel
