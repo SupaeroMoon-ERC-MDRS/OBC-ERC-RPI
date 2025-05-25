@@ -1,5 +1,6 @@
 from setuptools import find_packages, setup
 from glob import glob
+import os
 
 package_name = 'erc_build'
 
@@ -13,6 +14,8 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', glob('launch/*')),
         ('share/' + package_name + '/config', glob('config/*.yaml')),
+        (os.path.join('lib', package_name), glob('sim_mdrs/roboclaw_driver.py')),
+
     ],
     install_requires=['setuptools'],
     zip_safe=True,
