@@ -24,7 +24,7 @@ class SixWheelFourWSController(Node):
         cmd = Float64MultiArray()
 
         # Default: no turning → all angles = 0
-        angle_fl = 45.0 #2
+        angle_fl = 46.0 #2
         angle_fr = 258.0 #1
         angle_rl = 249.0 #3
         angle_rr = 42.0 #0 +ve CCW
