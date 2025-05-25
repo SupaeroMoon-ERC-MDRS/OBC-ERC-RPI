@@ -69,6 +69,7 @@ class SixWheelFourWSController(Node):
 
         # Fill message in specified format
         self.get_logger().info(f"Publishing wheel commands: FL={angle_fl}, FR={angle_fr}, RL={angle_rl}, RR={angle_rr}, Vel={linear_vel}")
+        self.get_logger().info(f"Wheel velocities: FL={vel_fl}, FR={vel_fr}, ML={vel_ml}, MR={vel_mr}, RL={vel_rl}, RR={vel_rr}")
         cmd.data = [
             vel_fl, angle_fl,
             vel_fr, angle_fr,
