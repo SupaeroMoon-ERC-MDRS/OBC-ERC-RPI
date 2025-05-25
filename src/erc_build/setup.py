@@ -25,6 +25,7 @@ setup(
             'encoder_node = erc_build.encoder_node:main',
             'remote_messages_node = erc_build.remote_messages_node:main',
             'servo_control = erc_build.servo_control:main',
+            'keyboard_control = erc_build.keyboard_control:main',
         ],
     },
 )
