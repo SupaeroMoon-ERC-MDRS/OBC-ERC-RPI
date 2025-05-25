@@ -39,10 +39,10 @@ class SixWheelFourWSController(Node):
             radius_rl = turning_radius - (TRACK_WIDTH / 2)
             radius_rr = turning_radius + (TRACK_WIDTH / 2)
 
-            angle_fl = math.degrees(math.atan(WHEEL_BASE / radius_fl))
-            angle_fr = math.degrees(math.atan(WHEEL_BASE / radius_fr))
-            angle_rl = math.degrees(math.atan(-WHEEL_BASE / radius_rl))  # rear steering typically opposite for tighter turns
-            angle_rr = math.degrees(math.atan(-WHEEL_BASE / radius_rr))
+            angle_fl = 45.0 + math.degrees(math.atan(WHEEL_BASE / radius_fl))
+            angle_fr = 255.0 + math.degrees(math.atan(WHEEL_BASE / radius_fr))
+            angle_rl = 255.0 + math.degrees(math.atan(-WHEEL_BASE / radius_rl))  # rear steering typically opposite for tighter turns
+            angle_rr = 45.0 + math.degrees(math.atan(-WHEEL_BASE / radius_rr))
 
             vel_fl = vel_fr = vel_ml = vel_mr = linear_vel
             vel_rl = vel_rr = -linear_vel
@@ -87,9 +87,9 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        node.wheel_pub.publish([0.0] * 12)  # Stop all wheels on shutdown
+        node.wheel_pub.publish([0.0, 45.0, 0.0, 255.0, 0.0, 0.0, 0.0, 0.0, 0.0, 255.0, 0.0, 45.0])  # Stop all wheels on shutdown
     finally:
-        node.wheel_pub.publish([0.0] * 12)  # Stop all wheels on shutdown
+        node.wheel_pub.publish([0.0, 45.0, 0.0, 255.0, 0.0, 0.0, 0.0, 0.0, 0.0, 255.0, 0.0, 45.0])  # Stop all wheels on shutdown
         node.destroy_node()
         rclpy.shutdown()
 
