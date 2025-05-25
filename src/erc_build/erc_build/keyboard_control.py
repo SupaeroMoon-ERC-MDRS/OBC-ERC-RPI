@@ -62,8 +62,8 @@ class TeleopKeyboard(Node):
             linear_dir, angular_dir = move_bindings[key]
 
             # Increment the speed in the direction of the key press
-            self.linear_speed = linear_dir * (self.linear_speed + self.linear_increment)
-            self.angular_speed = angular_dir * (self.angular_speed + self.angular_increment)
+            self.linear_speed = self.linear_speed + linear_dir * self.linear_increment
+            self.angular_speed = self.angular_speed + angular_dir * self.angular_increment
 
             # Clamp the speeds to their maximum values
             self.linear_speed = max(min(self.linear_speed, self.max_linear_speed), -self.max_linear_speed)
