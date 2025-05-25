@@ -28,6 +28,7 @@ class SixWheelFourWSController(Node):
         angle_fr = 255.0
         angle_rl = 255.0
         angle_rr = 45.0
+        vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = 0.0
 
         if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-5:
             turning_radius = linear_vel / angular_vel
