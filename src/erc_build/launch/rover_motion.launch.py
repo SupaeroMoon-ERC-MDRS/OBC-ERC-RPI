@@ -6,8 +6,8 @@ def generate_launch_description():
         # Ackermann controller
         Node(
             package='erc_build',
-            executable='steering',
-            name='steering',
+            executable='steering_node',
+            name='steering_node',
             output='screen'
         ),
 
