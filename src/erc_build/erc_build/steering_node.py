@@ -56,8 +56,8 @@ class SixWheelFourWSController(Node):
 
             # Set opposite velocities for left/right sides
             turning_speed = angular_vel * (TRACK_WIDTH / 2.0)  # or tweak as needed
-            # vel_fl = vel_ml = vel_rl = -turning_speed
-            # vel_fr = vel_mr = vel_rr = turning_speed
+            vel_fl = vel_ml = vel_rl = -turning_speed
+            vel_fr = vel_mr = vel_rr = turning_speed
 
         else:
             # Straight motion or no motion
