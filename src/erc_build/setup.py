@@ -14,7 +14,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', glob('launch/*')),
         ('share/' + package_name + '/config', glob('config/*.yaml')),
-        (os.path.join('lib', package_name), glob('sim_mdrs/roboclaw_driver.py')),
+        (os.path.join('lib', package_name), glob('erc_build/roboclaw_driver.py')),
 
     ],
     install_requires=['setuptools'],
