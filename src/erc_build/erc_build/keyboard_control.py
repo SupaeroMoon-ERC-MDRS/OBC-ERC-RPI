@@ -39,7 +39,7 @@ class TeleopKeyboard(Node):
         self.linear_increment = 0.1  # Speed increment for linear motion
         self.angular_increment = 0.2  # Speed increment for angular motion
 
-        self.max_linear_speed = 10.0  # Maximum linear speed
+        self.max_linear_speed = 20.0  # Maximum linear speed
         self.max_angular_speed = 3.0  # Maximum angular speed
 
         print(instructions)
