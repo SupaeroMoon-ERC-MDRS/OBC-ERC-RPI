@@ -26,7 +26,7 @@ class SixWheelFourWSController(Node):
         # Default: no turning → all angles = 0
         angle_fl = 48.0 #2
         angle_fr = 260.0 #1
-        angle_rl = 248.0 #3
+        angle_rl = 250.0 #3
         angle_rr = 39.0 #0 +ve CCW
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = 0.0
 
