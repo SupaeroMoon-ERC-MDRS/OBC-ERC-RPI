@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from adafruit_servokit import ServoKit  # Example; replace with your actual hardware library
+import numpy as np
 import math
 # Init Adafruit PCA9685
 from adafruit_pca9685 import PCA9685
@@ -59,24 +60,34 @@ class IKServoController(Node):
         self.get_logger().info("IK Servo Controller node started.")
 
     def cmd_callback(self, msg):
-        if abs(msg.linear.x) > 1e-4 or abs(msg.linear.y) > 1e-4:
-            dx = msg.linear.x * 0.01
-            dy = msg.linear.y * 0.01
+        # if abs(msg.linear.x) > 1e-4 or abs(msg.linear.y) > 1e-4:
+        #     dx = msg.linear.x * 0.01
+        #     dy = msg.linear.y * 0.01
 
-            new_x = self.current_x + dx
-            new_y = self.current_y + dy
+        #     new_x = self.current_x + dx
+        #     new_y = self.current_y + dy
 
-            result = self.compute_ik(new_x, new_y)
+        #     result = self.compute_ik(new_x, new_y)
 
-            if result:
-                q1, q2 = result
-                self.send_to_servo(q1, self.theta_1)
-                self.send_to_servo(q2, self.theta_2)
-                self.current_x += dx
-                self.current_y += dy
-            else:
-                self.get_logger().warn(f"Unreachable target: ({new_x:.2f}, {new_y:.2f})")
-        
+        #     if result:
+        #         q1, q2 = result
+        #         self.send_to_servo(q1, self.theta_1)
+        #         self.send_to_servo(q2, self.theta_2)
+        #         self.current_x += dx
+        #         self.current_y += dy
+        #     else:
+        #         self.get_logger().warn(f"Unreachable target: ({new_x:.2f}, {new_y:.2f})")
+        if abs(msg.linear.x) > 1e-4: # open/close grip
+            dz = msg.linear.y * 5
+            self.theta_1_curr += dz
+            self.send_to_servo(self.theta_1_curr, self.theta_1)
+            # TODO: Implement servo limits
+        if abs(msg.linear.y) > 1e-4: # open/close grip
+            dz = msg.linear.y * 5
+            self.theta_2_curr += dz
+            self.send_to_servo(self.theta_2_curr, self.theta_2)
+            # TODO: Implement servo limits
+
         if abs(msg.linear.z) > 1e-4: # open/close grip
             dz = msg.linear.z * 5
             self.gripper_curr += dz
@@ -101,6 +112,7 @@ class IKServoController(Node):
 
     def compute_ik(self, x, y):
         d = (x**2 + y**2 - self.l1**2 - self.l2**2) / (2 * self.l1 * self.l2)
+
         if abs(d) > 1.0:
             return None
         q2 = math.acos(d)
@@ -110,12 +122,13 @@ class IKServoController(Node):
         return q1, q2
 
     def send_to_servo(self, q1, servo1):
-        a1 = q1 *180/ 300
+        a1 = q1 * 180/ 300
         # Clamp to [0, 180] as needed for hobby servos
         a1 = max(0, min(180, a1))  # Offset for center position
 
         self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
         servo1.angle = a1
+
 
 def main(args=None):
     rclpy.init(args=args)
