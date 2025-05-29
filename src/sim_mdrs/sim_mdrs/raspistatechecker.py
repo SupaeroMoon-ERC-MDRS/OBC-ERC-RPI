@@ -32,12 +32,14 @@ class DummyMessage:
         self.rpi_temp = 0
         self.rpi_cpu = 0
         self.rpi_mem = 0
+        self.rpi_rssi = 0
 
 
 class RaspiStateChecker:
     __ELEC_COMMAND = ["vcgencmd", "pmic_read_adc"]
     __TEMP_COMMAND = ["vcgencmd", "measure_temp"]
     __TOP_COMMAND = ['top', '-b', '-n', '1', '-o', 'PID']
+    __RSSI_COMMAND = ['iw', 'wlan0', 'link']
 
     __POLL_INTERVAL_MS = 10
     __POLL_INTERVAL = __POLL_INTERVAL_MS * 1000 * 1000
@@ -91,6 +93,10 @@ class RaspiStateChecker:
         raspi_state_msg.rpi_cpu = cpu / RaspiStateChecker.__CPU_COUNT
         raspi_state_msg.rpi_mem = mem
 
+    @staticmethod
+    def __process_rssi(raspi_state_msg, rssi_stdio: bytes):
+        raspi_state_msg.rpi_rssi = int(float(rssi_stdio.split(b'\n')[5].split(b": ")[-1].split(b" dBm")[0]))
+
     def poll(self, raspi_state_msg) -> bool:
         if time_ns() - self.last_polled < RaspiStateChecker.__POLL_INTERVAL:
             return False
@@ -116,6 +122,15 @@ class RaspiStateChecker:
             print(f"The command {RaspiStateChecker.__TEMP_COMMAND} failed")
 
         try:
+            res = run(RaspiStateChecker.__RSSI_COMMAND, capture_output=True)
+            if res.returncode:
+                print(f"The command {RaspiStateChecker.__RSSI_COMMAND} failed with: {res.stderr}")
+            res.check_returncode()
+            RaspiStateChecker.__process_rssi(raspi_state_msg, res.stdout)
+        except Exception:
+            print(f"The command {RaspiStateChecker.__RSSI_COMMAND} failed")
+
+        try:
             res = run(RaspiStateChecker.__TOP_COMMAND, capture_output=True)
 
             if res.returncode:
@@ -133,5 +148,7 @@ if __name__ == '__main__':
     rsc = RaspiStateChecker()
     sleep(1)
     print(rsc.poll(msg))
+    print(msg.rpi_rssi)
     sleep(1)
     print(rsc.poll(msg))
+    print(msg.rpi_rssi)
