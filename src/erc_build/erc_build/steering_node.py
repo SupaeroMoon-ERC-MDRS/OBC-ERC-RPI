@@ -27,7 +27,7 @@ class SixWheelFourWSController(Node):
         angle_fl = 49.0 #2
         angle_fr = 261.0 #1
         angle_rl = 247.0 #3
-        angle_rr = 39.0 #0 +ve CCW
+        angle_rr = 40.0 #0 +ve CCW
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = 0.0
 
         if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-5:
