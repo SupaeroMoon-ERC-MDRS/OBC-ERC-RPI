@@ -78,7 +78,7 @@ class IKServoController(Node):
         #     else:
         #         self.get_logger().warn(f"Unreachable target: ({new_x:.2f}, {new_y:.2f})")
         if abs(msg.linear.x) > 1e-4: # open/close grip
-            dz = msg.linear.y * 5
+            dz = msg.linear.x * 5
             self.theta_1_curr += dz
             self.send_to_servo(self.theta_1_curr, self.theta_1)
             # TODO: Implement servo limits
