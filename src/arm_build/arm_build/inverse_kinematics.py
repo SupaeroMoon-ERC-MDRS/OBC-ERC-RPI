@@ -13,12 +13,12 @@ class IKServoController(Node):
     def __init__(self):
         super().__init__('inverse_kinematics')
 
-        self.current_x = 0.1
-        self.current_y = 0.1 # Total height of arm goes here
+        self.current_x = 0.2269
+        self.current_y = 0.0 # Total height of arm goes here
         self.base_curr = 0.0
-        self.theta_1_curr = 0.0
-        self.theta_2_curr = 0.0
-        self.wrist_link_curr = 0.0
+        self.theta_1_curr = -30.0
+        self.theta_2_curr = -30.0
+        self.wrist_link_curr = 30.0
         self.wrist_rot_curr = 0.0
         self.gripper_curr = 90.0
 
