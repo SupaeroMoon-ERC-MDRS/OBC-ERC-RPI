@@ -78,18 +78,18 @@ class IKServoController(Node):
         #     else:
         #         self.get_logger().warn(f"Unreachable target: ({new_x:.2f}, {new_y:.2f})")
         if abs(msg.linear.x) > 1e-4: # open/close grip
-            dz = msg.linear.x * 5
+            dz = msg.linear.x * 3
             self.theta_1_curr += dz
             self.send_to_servo(self.theta_1_curr, self.theta_1)
             # TODO: Implement servo limits
         if abs(msg.linear.y) > 1e-4: # open/close grip
-            dz = msg.linear.y * 5
+            dz = msg.linear.y * 3
             self.theta_2_curr += dz
             self.send_to_servo(self.theta_2_curr, self.theta_2)
             # TODO: Implement servo limits
 
         if abs(msg.linear.z) > 1e-4: # open/close grip
-            dz = msg.linear.z * 5
+            dz = msg.linear.z * 3
             self.gripper_curr += dz
             self.send_to_servo(self.gripper_curr, self.gripper)
             # TODO: Implement servo limits
@@ -105,7 +105,7 @@ class IKServoController(Node):
             self.send_to_servo(self.wrist_rot_curr, self.wrist_rot)
 
         if abs(msg.angular.z) > 1e-4: # tilt wrist
-            dtheta = msg.angular.z * 10
+            dtheta = msg.angular.z * 2
             self.wrist_link_curr += dtheta
             self.send_to_servo(self.wrist_link_curr, self.wrist_link)
 
@@ -124,7 +124,7 @@ class IKServoController(Node):
     def send_to_servo(self, q1, servo1):
         a1 = q1 * 180/ 300
         # Clamp to [0, 180] as needed for hobby servos
-        # a1 = max(0, min(180, a1))  # Offset for center position
+        a1 = max(0, min(180, a1))  # Offset for center position
 
         self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
         servo1.angle = a1
