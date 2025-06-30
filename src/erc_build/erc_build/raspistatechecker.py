@@ -1,5 +1,8 @@
 from time import time_ns, sleep
 from subprocess import run
+from board import SCL, SDA
+from busio import I2C
+from adafruit_ina260 import INA260
 
 class DummyMessage:
     def __init__(self):
@@ -33,6 +36,8 @@ class DummyMessage:
         self.rpi_cpu = 0
         self.rpi_mem = 0
         self.rpi_rssi = 0
+        self.rpi_ina_voltage = 0
+        self.rpi_ina_current = 0
 
 
 class RaspiStateChecker:
@@ -48,6 +53,14 @@ class RaspiStateChecker:
 
     def __init__(self):
         self.last_polled = time_ns()
+        self.has_ina = False
+
+        try:
+            self.i2c = I2C(SCL, SDA)
+            self.ina260 = INA260(self.i2c, address=0x40)
+            self.has_ina = True
+        except BaseException:
+            pass
 
     @staticmethod
     def __process_elec(raspi_state_msg, elec_stdio: bytes):
@@ -97,6 +110,10 @@ class RaspiStateChecker:
     def __process_rssi(raspi_state_msg, rssi_stdio: bytes):
         raspi_state_msg.rpi_rssi = int(float(rssi_stdio.split(b'\n')[5].split(b": ")[-1].split(b" dBm")[0]))
 
+    def __process_ina(self, raspi_state_msg):
+        raspi_state_msg.rpi_ina_voltage = self.ina260.voltage
+        raspi_state_msg.rpi_ina_current = self.ina260.current
+
     def poll(self, raspi_state_msg) -> bool:
         if time_ns() - self.last_polled < RaspiStateChecker.__POLL_INTERVAL:
             return False
@@ -139,6 +156,12 @@ class RaspiStateChecker:
             RaspiStateChecker.__process_top(raspi_state_msg, res.stdout)
         except Exception as e:
             print(f"The command {RaspiStateChecker.__TOP_COMMAND} failed {e}")
+
+        if self.has_ina:
+            try:
+                self.__process_ina(raspi_state_msg)
+            except Exception as e:
+                print(f"The INA readouts failed {e}")
 
         return True
 
