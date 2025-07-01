@@ -15,6 +15,8 @@ setup(
         ('share/' + package_name + '/launch', glob('launch/*')),
         ('share/' + package_name + '/config', glob('config/*.yaml')),
         (os.path.join('lib', package_name), glob('erc_build/roboclaw_driver.py')),
+        (os.path.join('lib', package_name), glob('erc_build/udpcanpy*')),
+        (os.path.join('lib', package_name), glob('erc_build/comms.dbc')),
 
     ],
     install_requires=['setuptools'],
