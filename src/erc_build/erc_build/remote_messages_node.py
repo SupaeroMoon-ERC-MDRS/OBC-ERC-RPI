@@ -1,6 +1,6 @@
 ## To create a ROS node to process incoming messages from the remote control
 """To be tested"""
-from udpcanpy import NetworkHandler, RemoteControl, NavOdometry, RaspiState #to access the UPDCAN protocol
+from udpcanpy import NetworkHandler, RemoteControl, RaspiState #to access the UPDCAN protocol
 import rclpy
 from rclpy.node import Node
 from raspistatechecker import RaspiStateChecker
@@ -64,8 +64,8 @@ class RemoteComms(Node):
         self.remote = self.nh.getRemoteControl() #This creates the higher order structure that contains the data we need to access - MessageWrapper equivalent, I think
         self.data = RemoteControl() #object to eventually store the message data when accessed
 
-        self.odom_wrap = self.nh.getNavOdometry() #need to check message definition with Dávid
-        self.odomess = NavOdometry()
+        # self.odom_wrap = self.nh.getNavOdometry() #need to check message definition with Dávid
+        # self.odomess = NavOdometry()
 
         self.raspihandle = self.nh.getRaspiState()
         self.raspi = RaspiState()
