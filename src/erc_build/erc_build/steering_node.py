@@ -16,6 +16,9 @@ class SixWheelFourWSController(Node):
         self.wheel_pub = self.create_publisher(Float64MultiArray, '/wheel_controller/commands', 1)
         self.get_logger().info('Six Wheel Four Wheel Steering Controller Node initialized.')
 
+        cmd_vel_callback(Twist())
+        self.get_logger().info('Six Wheel Four Wheel Steering Controller Zeroed.')
+
     def cmd_vel_callback(self, msg):
         linear_vel = msg.linear.x
         angular_vel = msg.angular.z
