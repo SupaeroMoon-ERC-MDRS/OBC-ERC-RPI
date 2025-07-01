@@ -33,7 +33,7 @@ class RemoteComms(Node):
         self.cmd_vel_pub = self.create_publisher(msg_type=Twist,topic="/cmd_vel",qos_profile=10)
         self.cmd_arm_motion_pub = self.create_publisher(msg_type=Twist,topic="/cmd_move_arm",qos_profile=10)
         #self.cmd_arm_grip_pub = self.create_publisher(msg_type=Bool,topic="/cmd_grip_arm",qos_profile=10)
-        self.odom_sub = self.create_subscription(msg_type=Odometry,topic="/odom",callback = self.rec_odom ,qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
+        # self.odom_sub = self.create_subscription(msg_type=Odometry,topic="/odom",callback = self.rec_odom ,qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
         """The queue size has been set to 10 for now, but it can be changed as necessary"""
         
         ## Next step is to create interface with comms protocol to get remote input and store it for the node to publish
