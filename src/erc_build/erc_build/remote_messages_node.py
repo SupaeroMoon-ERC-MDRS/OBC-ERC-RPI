@@ -25,7 +25,7 @@ class EmStop(Exception):
 
 class RemoteComms(Node):
 
-    def __init__(self,protocol:str = "src/sim_mdrs/sim_mdrs/comms.dbc"): # string is placeholder to be replaced with actual path on device
+    def __init__(self,protocol:str = "src/erc_build/erc_build/comms.dbc"): # string is placeholder to be replaced with actual path on device
         super().__init__("RemoteComms") #placeholder name for now
         """TO ADD: Logger initialisation and parameter declaration (if needed)"""
 
