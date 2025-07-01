@@ -8,6 +8,7 @@ from raspistatechecker import RaspiStateChecker
 from std_msgs.msg import Float64, Bool
 from geometry_msgs.msg import Twist, Quaternion
 from nav_msgs.msg import Odometry
+import numpy as np
 
 class StopWorthyException(Exception):
     "Raised for crucial failures"
@@ -45,7 +46,7 @@ class RemoteComms(Node):
             self.get_logger().error(f"Failed to parse UDPCAN protocol, error code: {self.res}")
             raise StopWorthyException(f"UDPCAN Parsing error {self.res} - stopping rover")
 
-        self.res = self.nh.init()
+        self.res = self.nh.init(0)
         if self.res != 0:
             if self.res == 1025:
                 self.get_logger().error(f"Bind error - error code: {self.res}")
@@ -104,7 +105,7 @@ class RemoteComms(Node):
 
     def remote_input(self):
        ## main method to access the input message from the remote control and publish to topic
-        if self.e_stop:
+        if self.e_stop or (self.data.l_left and self.data.r_right):
             self.emergency_stop()
         elif not self.e_stop:
             self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
@@ -145,7 +146,7 @@ class RemoteComms(Node):
                     if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd:
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
-                elif self.arm_mode:
+                elif self.arm_mode and False:
                     self.arm_command()
 
 

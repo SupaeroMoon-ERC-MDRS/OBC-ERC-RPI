@@ -28,10 +28,16 @@ def generate_launch_description():
         ),
 
         # Remote messages (e.g., joystick or high-level commands)
+        # Node(
+        #     package='erc_build',
+        #     executable='keyboard_control',
+        #     name='keyboard_control',
+        #     output='screen'
+        # ),
         Node(
             package='erc_build',
-            executable='keyboard_control',
-            name='keyboard_control',
+            executable='remote_messages_node',
+            name='remote_messages_node',
             output='screen'
         ),
         Node(
