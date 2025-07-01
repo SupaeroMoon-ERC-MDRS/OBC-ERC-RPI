@@ -306,8 +306,7 @@ class RemoteComms(Node):
         self.nh.pushTelemMessage()
         self.nh.flush()
 
-    def rec_odom(self):
-        odom_now = self.odom_sub.read()
+    def rec_odom(self, odom_now):
         self.x_pos = odom_now.pose.pose.position.x
         self.y_pos = odom_now.pose.pose.position.y
         self.z_pos = odom_now.pose.pose.position.z
