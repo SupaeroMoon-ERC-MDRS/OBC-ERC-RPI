@@ -85,11 +85,11 @@ class RemoteComms(Node):
         self.ang_speed = 0.0
         
         # values by which to increment the speeds when a button is pressed
-        self.lin_inc = 0.07
+        self.lin_inc = 0.5
         self.ang_inc = 0.2
 
         # setting max limits
-        self.max_lin_speed = 3.0
+        self.max_lin_speed = 20.0
         self.max_ang_speed = 3.0
 
         ##initialise arm control variables
