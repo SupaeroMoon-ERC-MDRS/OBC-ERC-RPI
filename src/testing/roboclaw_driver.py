@@ -9,9 +9,9 @@ class Roboclaw:
 	def __init__(self, comport, rate, timeout=0.01, retries=3):
 		self.comport = comport
 		self.rate = rate
-		self.timeout = timeout;
+		self.timeout = timeout
 		self._trystimeout = retries
-		self._crc = 0;
+		self._crc = 0
 
 	#Command Enums
 	class Cmd():
@@ -711,7 +711,6 @@ class Roboclaw:
 		trys=self._trystimeout
 		while 1:
 			self._port.flushInput()
-			print("test")
 			self._sendcommand(address,self.Cmd.GETVERSION)
 			str = ""
 			passed = True
