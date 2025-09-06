@@ -290,7 +290,7 @@ class RemoteComms(Node):
         twist = Twist()
         self.cmd_vel_pub.publish(twist)
 
-        movearm = Quaternion()
+        movearm = Twist()
         self.cmd_arm_motion_pub.publish(movearm)
         end_cmd = Bool()
         end_cmd.data = False
