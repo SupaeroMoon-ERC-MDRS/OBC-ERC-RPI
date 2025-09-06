@@ -14,10 +14,10 @@ class SixWheelFourWSController(Node):
         super().__init__('six_wheel_fourws_controller')
 
         self.servo_zero = {
-            "fl": 49,
-            "fr": 261,
-            "rl": 247,
-            "rr": 40
+            "fl": 49.0,
+            "fr": 261.0,
+            "rl": 247.0,
+            "rr": 40.0
         }
 
         self.cmd_sub = self.create_subscription(Twist, 'cmd_vel', self.cmd_vel_callback, 1)
