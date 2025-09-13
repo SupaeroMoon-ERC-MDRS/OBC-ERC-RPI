@@ -104,16 +104,16 @@ class RemoteComms(Node):
         self.timer = self.create_timer(0.2,self.remote_input)
 
     def remote_input(self):
-       ## main method to access the input message from the remote control and publish to topic
-        if self.e_stop or (self.data.l_left and self.data.r_right):
-            self.get_logger().info(f"Received estop")
-            self.emergency_stop()
-        elif not self.e_stop:
-            self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
-            if self.res >= 1024:
-                self.get_logger().error(f"Could not access remote data, error code: {self.res}")
-                raise RetryWorthyException(f"Remote message access error {self.res} - retrying")
-            elif self.res == 0: #no error code
+        self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
+        if self.res >= 1024:
+            self.get_logger().error(f"Could not access remote data, error code: {self.res}")
+            raise RetryWorthyException(f"Remote message access error {self.res} - retrying")
+        elif self.res == 0: #no error code
+            ## main method to access the input message from the remote control and publish to topic
+            if self.data.e_stop or (self.data.l_left and self.data.r_right):
+                self.get_logger().info(f"Received estop")
+                self.emergency_stop()
+            elif not self.e_stop:
                 self.e_stop = self.data.e_stop # bool # overwriting emergency stop variable with actual input
                 self.LB = self.data.l_bottom # bool
                 self.LT = self.data.l_top # bool
