@@ -72,6 +72,7 @@ class SixWheelFourWSController(Node):
             vel_fr = vel_mr = turning_speed
             vel_rl = turning_speed
             vel_rr = -turning_speed
+            self.get_logger().info(f"In-place turning mode, angles: FL={angle_fl}, FR={angle_fr}, RL={angle_rl}, RR={angle_rr}")
 
         else:
             # Straight motion or no motion
