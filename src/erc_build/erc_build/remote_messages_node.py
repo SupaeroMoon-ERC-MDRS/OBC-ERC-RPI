@@ -109,7 +109,6 @@ class RemoteComms(Node):
             self.get_logger().info(f"Received estop")
             self.emergency_stop()
         elif not self.e_stop:
-            self.get_logger().info(f"Received command")
             self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
             if self.res >= 1024:
                 self.get_logger().error(f"Could not access remote data, error code: {self.res}")
@@ -146,6 +145,7 @@ class RemoteComms(Node):
 
                 if not self.arm_mode:
                     if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd:
+                        self.get_logger().info(f"Received command")
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode and False:
