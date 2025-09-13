@@ -292,9 +292,9 @@ class RemoteComms(Node):
 
         movearm = Twist()
         self.cmd_arm_motion_pub.publish(movearm)
-        end_cmd = Bool()
-        end_cmd.data = False
-        self.cmd_arm_grip_pub.publish(end_cmd)
+        # end_cmd = Bool()
+        # end_cmd.data = False
+        # self.cmd_arm_grip_pub.publish(end_cmd)
         if direct:
             raise EmStop("EMERGENCY! Stopping...")
         
