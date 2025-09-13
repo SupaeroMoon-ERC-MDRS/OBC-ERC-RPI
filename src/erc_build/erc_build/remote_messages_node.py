@@ -106,8 +106,10 @@ class RemoteComms(Node):
     def remote_input(self):
        ## main method to access the input message from the remote control and publish to topic
         if self.e_stop or (self.data.l_left and self.data.r_right):
+            self.get_logger().info(f"Received estop")
             self.emergency_stop()
         elif not self.e_stop:
+            self.get_logger().info(f"Received command")
             self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
             if self.res >= 1024:
                 self.get_logger().error(f"Could not access remote data, error code: {self.res}")
