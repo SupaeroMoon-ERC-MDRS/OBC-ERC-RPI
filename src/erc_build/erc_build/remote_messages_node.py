@@ -173,7 +173,7 @@ class RemoteComms(Node):
                     ThumbRY: {self.ThumbRY}\n")
     
     def print_remote_data(self):
-        self.get_logger().debug(f"=================\n\
+        self.get_logger().info(f"=================\n\
                     LB: {self.data.l_bottom}\n\
                     LT: {self.data.l_top}\n\
                     LR: {self.data.l_right}\n\
