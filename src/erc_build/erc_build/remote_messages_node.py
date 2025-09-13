@@ -146,6 +146,7 @@ class RemoteComms(Node):
                 if not self.arm_mode:
                     if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd:
                         self.get_logger().info(f"Received command")
+                        self.print_remote_data()
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode and False:
