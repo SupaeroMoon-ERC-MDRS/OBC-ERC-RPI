@@ -105,8 +105,16 @@ class RemoteComms(Node):
 
         # Timer to run remote input method repeatedly once the Node is initialised
         self.timer = self.create_timer(0.2,self.remote_input)
+        self.tempTimer = self.create_timer(0.01,self.sendTelemetryTemporary)
 
-    def remote_input(self):
+    def sendTelemetryTemporary(self):
+        if self.rsc.poll(self.raspi):
+            self.raspihandle.update(self.raspi)
+            self.nh.pushRaspiState()
+
+        self.nh.flush()
+
+    def remote_input(self):        
         self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
         if self.res >= 1024:
             self.get_logger().error(f"Could not access remote data, error code: {self.res}")
