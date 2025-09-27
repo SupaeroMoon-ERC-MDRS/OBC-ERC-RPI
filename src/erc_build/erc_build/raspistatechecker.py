@@ -112,7 +112,7 @@ class RaspiStateChecker:
 
     def __process_ina(self, raspi_state_msg):
         raspi_state_msg.rpi_ina_voltage = self.ina260.voltage
-        raspi_state_msg.rpi_ina_current = self.ina260.current
+        raspi_state_msg.rpi_ina_current = self.ina260.current / 1e3
 
     def poll(self, raspi_state_msg) -> bool:
         if time_ns() - self.last_polled < RaspiStateChecker.__POLL_INTERVAL:
