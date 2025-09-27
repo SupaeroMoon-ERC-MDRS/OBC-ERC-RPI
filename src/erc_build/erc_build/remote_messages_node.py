@@ -114,6 +114,10 @@ class RemoteComms(Node):
                 self.get_logger().info(f"Received estop")
                 self.emergency_stop()
             elif not self.e_stop:
+                newRThumbX = self.data.thumb_right_x if abs(self.data.thumb_right_x - 127) > 20 else 127
+                newRThumbY = self.data.thumb_right_y if abs(self.data.thumb_right_y - 127) > 20 else 127
+                rThumbChange = self.ThumbRX != newRThumbX or self.ThumbRY != newRThumbY
+
                 self.e_stop = self.data.e_stop # bool # overwriting emergency stop variable with actual input
                 self.LB = self.data.l_bottom # bool
                 self.LT = self.data.l_top # bool
@@ -129,8 +133,8 @@ class RemoteComms(Node):
                 self.R2 = self.data.right_trigger # int 0-255 # R2 on PS4, RT on Xbox
                 self.ThumbLX = self.data.thumb_left_x # int 0-255
                 self.ThumbLY = self.data.thumb_left_y # int 0-255
-                self.ThumbRX = self.data.thumb_right_x # int 0-255 
-                self.ThumbRY = self.data.thumb_right_y # int 0-255
+                self.ThumbRX = newRThumbX # int 0-255 
+                self.ThumbRY = newRThumbY # int 0-255
 
                 # self.get_logger().error(self)
 
@@ -144,7 +148,7 @@ class RemoteComms(Node):
                 self.prev_toggle = [self.L1,self.R1]
 
                 if not self.arm_mode:
-                    if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd or abs(self.ThumbRX - 127.0) > 20 or abs(self.ThumbRY - 127.0) > 20:
+                    if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd or rThumbChange:
                         self.get_logger().info(f"Received command")
                         self.print_remote_data()
                         self.rover_command()
@@ -204,10 +208,8 @@ class RemoteComms(Node):
         elif self.LR:
             self.ang_speed -= self.ang_inc
         else:
-            if abs(self.ThumbRX - 127.0) > 20:
-                self.ang_speed = (self.ThumbRX - 127.0) / 128.0 * self.max_ang_speed
-            if abs(self.ThumbRY - 127.0) > 20:
-                self.lin_speed = (self.ThumbRY - 127.0) / 128.0 * self.max_lin_speed
+            self.ang_speed = (self.ThumbRX - 127.0) / 128.0 * self.max_ang_speed
+            self.lin_speed = (self.ThumbRY - 127.0) / 128.0 * self.max_lin_speed
 
         # Clamp the speeds to their maximum values
         self.lin_speed = max(min(self.lin_speed, self.max_lin_speed), -self.max_lin_speed)
