@@ -144,7 +144,7 @@ class RemoteComms(Node):
                 self.prev_toggle = [self.L1,self.R1]
 
                 if not self.arm_mode:
-                    if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd:
+                    if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd or abs(self.ThumbRX - 127.0) > 20 or abs(self.ThumbRY - 127.0) > 20:
                         self.get_logger().info(f"Received command")
                         self.print_remote_data()
                         self.rover_command()
@@ -203,6 +203,11 @@ class RemoteComms(Node):
             self.ang_speed += self.ang_inc
         elif self.LR:
             self.ang_speed -= self.ang_inc
+        else:
+            if abs(self.ThumbRX - 127.0) > 20:
+                self.ang_speed = (self.ThumbRX - 127.0) / 128.0 * self.max_ang_speed
+            if abs(self.ThumbRY - 127.0) > 20:
+                self.lin_speed = (self.ThumbRY - 127.0) / 128.0 * self.max_lin_speed
 
         # Clamp the speeds to their maximum values
         self.lin_speed = max(min(self.lin_speed, self.max_lin_speed), -self.max_lin_speed)
