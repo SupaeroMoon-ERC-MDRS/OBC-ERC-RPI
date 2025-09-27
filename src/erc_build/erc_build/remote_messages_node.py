@@ -100,6 +100,9 @@ class RemoteComms(Node):
         self.end_theta = 0.0 #gripper (end-vector) rotation
         self.end_grip = False #gripper grab or not
 
+        self.ThumbRX = 127.0
+        self.ThumbRY = 127.0
+
         # Timer to run remote input method repeatedly once the Node is initialised
         self.timer = self.create_timer(0.2,self.remote_input)
 
@@ -114,8 +117,8 @@ class RemoteComms(Node):
                 self.get_logger().info(f"Received estop")
                 self.emergency_stop()
             elif not self.e_stop:
-                newRThumbX = self.data.thumb_right_x if abs(self.data.thumb_right_x - 127) > 20 else 127
-                newRThumbY = self.data.thumb_right_y if abs(self.data.thumb_right_y - 127) > 20 else 127
+                newRThumbX = self.data.thumb_right_x if abs(self.data.thumb_right_x - 127.0) > 20.0 else 127.0
+                newRThumbY = self.data.thumb_right_y if abs(self.data.thumb_right_y - 127.0) > 20.0 else 127.0
                 rThumbChange = self.ThumbRX != newRThumbX or self.ThumbRY != newRThumbY
 
                 self.e_stop = self.data.e_stop # bool # overwriting emergency stop variable with actual input
