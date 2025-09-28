@@ -102,6 +102,8 @@ class RemoteComms(Node):
 
         self.ThumbRX = 127.0
         self.ThumbRY = 127.0
+        self.ThumbDeadZone = 10.0
+        self.ThumbCenter = 127.0
 
         # Timer to run remote input method repeatedly once the Node is initialised
         self.timer = self.create_timer(0.2,self.remote_input)
@@ -125,8 +127,8 @@ class RemoteComms(Node):
                 self.get_logger().info(f"Received estop")
                 self.emergency_stop()
             elif not self.e_stop:
-                newRThumbX = self.data.thumb_right_x if abs(self.data.thumb_right_x - 127.0) > 20.0 else 127.0
-                newRThumbY = self.data.thumb_right_y if abs(self.data.thumb_right_y - 127.0) > 20.0 else 127.0
+                newRThumbX = self.data.thumb_right_x if abs(self.data.thumb_right_x - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
+                newRThumbY = self.data.thumb_right_y if abs(self.data.thumb_right_y - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
                 rThumbChange = self.ThumbRX != newRThumbX or self.ThumbRY != newRThumbY
 
                 self.e_stop = self.data.e_stop # bool # overwriting emergency stop variable with actual input
@@ -207,6 +209,15 @@ class RemoteComms(Node):
                     ThumbRY: {self.data.thumb_right_y}\n\
                         ")
                 
+
+    def thumb_curve(self, x):
+        if x > self.ThumbCenter + self.ThumbDeadZone:
+            return (1.3 ** ((x - self.ThumbCenter - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
+        elif x < self.ThumbCenter - self.ThumbDeadZone:
+            return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
+        else:
+            return 0
+
     def rover_command(self):
         ## method to update and publish velocity commands in rover mode
         # update velocities based on new inputs
@@ -219,8 +230,8 @@ class RemoteComms(Node):
         elif self.LR:
             self.ang_speed -= self.ang_inc
         else:
-            self.ang_speed = (self.ThumbRX - 127.0) / 128.0 * self.max_ang_speed
-            self.lin_speed = (self.ThumbRY - 127.0) / 128.0 * self.max_lin_speed
+            self.ang_speed = self.thumb_curve(self.ThumbRX)
+            self.lin_speed = self.thumb_curve(self.ThumbRY)
 
         # Clamp the speeds to their maximum values
         self.lin_speed = max(min(self.lin_speed, self.max_lin_speed), -self.max_lin_speed)
