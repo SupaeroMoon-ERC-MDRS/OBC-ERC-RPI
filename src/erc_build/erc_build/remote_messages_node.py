@@ -216,7 +216,7 @@ class RemoteComms(Node):
         elif x < self.ThumbCenter - self.ThumbDeadZone:
             return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
         else:
-            return 0
+            return 0.0
 
     def rover_command(self):
         ## method to update and publish velocity commands in rover mode
@@ -230,8 +230,8 @@ class RemoteComms(Node):
         elif self.LR:
             self.ang_speed -= self.ang_inc
         else:
-            self.ang_speed = self.thumb_curve(self.ThumbRX)
-            self.lin_speed = self.thumb_curve(self.ThumbRY)
+            self.ang_speed = self.thumb_curve(self.ThumbRX) * self.max_ang_speed
+            self.lin_speed = self.thumb_curve(self.ThumbRY) * self.max_lin_speed
 
         # Clamp the speeds to their maximum values
         self.lin_speed = max(min(self.lin_speed, self.max_lin_speed), -self.max_lin_speed)
