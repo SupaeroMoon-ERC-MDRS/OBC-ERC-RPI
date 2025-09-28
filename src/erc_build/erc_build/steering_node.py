@@ -41,7 +41,8 @@ class SixWheelFourWSController(Node):
         angle_rr = self.servo_zero["rr"] #0 +ve CCW
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = 0.0
 
-        if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-5:
+        #if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-5:
+        if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-1:
             turning_radius = linear_vel / angular_vel
 
             # Calculate individual steering angles (Ackermann geometry)
@@ -59,7 +60,7 @@ class SixWheelFourWSController(Node):
             vel_rl = vel_rr = -linear_vel
             self.get_logger().info(f"Calculated angles: FL={angle_fl}, FR={angle_fr}, RL={angle_rl}, RR={angle_rr}")
 
-        elif abs(angular_vel) > 1e-5 and abs(linear_vel) <= 1e-5:
+        elif False and abs(angular_vel) > 1e-5 and abs(linear_vel) <= 1e-5:
             # Wheels turned ±45° for in-place rotation
             angle_fl = 10.0 # we are lucky on this one
             angle_fr = 290.0 # oh no if this is based on the (zero_fr + 45) its greater than 300 :(
