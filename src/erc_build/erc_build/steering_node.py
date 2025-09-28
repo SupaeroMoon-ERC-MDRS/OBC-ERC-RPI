@@ -16,7 +16,7 @@ class SixWheelFourWSController(Node):
         self.servo_zero = {
             "fl": 45.0,
             "fr": 258.0,
-            "rl": 245.0,
+            "rl": 246.0,
             "rr": 41.0
         }
 
