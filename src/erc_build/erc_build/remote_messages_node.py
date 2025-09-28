@@ -100,6 +100,8 @@ class RemoteComms(Node):
         self.end_theta = 0.0 #gripper (end-vector) rotation
         self.end_grip = False #gripper grab or not
 
+        self.ThumbLX = 127.0
+        self.ThumbLY = 127.0
         self.ThumbRX = 127.0
         self.ThumbRY = 127.0
         self.ThumbDeadZone = 10.0
@@ -127,6 +129,10 @@ class RemoteComms(Node):
                 self.get_logger().info(f"Received estop")
                 self.emergency_stop()
             elif not self.e_stop:
+                newLThumbX = self.data.thumb_left_x if abs(self.data.thumb_left_x - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
+                newLThumbY = self.data.thumb_left_y if abs(self.data.thumb_left_y - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
+                lThumbChange = self.ThumbLX != newLThumbX or self.ThumbLY != newLThumbY
+
                 newRThumbX = self.data.thumb_right_x if abs(self.data.thumb_right_x - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
                 newRThumbY = self.data.thumb_right_y if abs(self.data.thumb_right_y - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
                 rThumbChange = self.ThumbRX != newRThumbX or self.ThumbRY != newRThumbY
@@ -144,8 +150,8 @@ class RemoteComms(Node):
                 self.R1 = self.data.r_shoulder # bool # R1 on PS4, RS/RB on Xbox
                 self.L2 = self.data.left_trigger # int 0-255 # L2 on PS4, LT on Xbox
                 self.R2 = self.data.right_trigger # int 0-255 # R2 on PS4, RT on Xbox
-                self.ThumbLX = self.data.thumb_left_x # int 0-255
-                self.ThumbLY = self.data.thumb_left_y # int 0-255
+                self.ThumbLX = newLThumbX # int 0-255
+                self.ThumbLY = newLThumbY # int 0-255
                 self.ThumbRX = newRThumbX # int 0-255 
                 self.ThumbRY = newRThumbY # int 0-255
 
@@ -161,7 +167,7 @@ class RemoteComms(Node):
                 self.prev_toggle = [self.L1,self.R1]
 
                 if not self.arm_mode:
-                    if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd or rThumbChange:
+                    if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd or rThumbChange or lThumbChange:
                         self.get_logger().info(f"Received command")
                         self.print_remote_data()
                         self.rover_command()
@@ -230,8 +236,8 @@ class RemoteComms(Node):
         elif self.LR:
             self.ang_speed -= self.ang_inc
         else:
-            self.ang_speed = self.thumb_curve(self.ThumbRX) * self.max_ang_speed
-            self.lin_speed = self.thumb_curve(self.ThumbRY) * self.max_lin_speed
+            self.ang_speed = self.thumb_curve(self.ThumbLX) * self.max_ang_speed
+            self.lin_speed = self.thumb_curve(self.ThumbLY) * self.max_lin_speed
 
         # Clamp the speeds to their maximum values
         self.lin_speed = max(min(self.lin_speed, self.max_lin_speed), -self.max_lin_speed)
