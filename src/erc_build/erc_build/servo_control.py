@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
+import curses
 
 import board
 import busio
@@ -32,16 +33,58 @@ class ServoSteeringNode(Node):
             'rl': servo.Servo(self.pca.channels[3], min_pulse=500, max_pulse=2500),  # rear-left
             'rr': servo.Servo(self.pca.channels[0], min_pulse=500, max_pulse=2500)   # rear-right
         }
+        self.servo_zero = {
+            "fl": 45.0,
+            "fr": 245.0,
+            "rl": 245.0,
+            "rr": 45.0
+        }
 
+        self.calibrate_servos()
         self.get_logger().info('Servo Steering Node initialized.')
+
+    def calibrate_servos(self):
+        choice = input("Would you like to calibrate? [y/N] ").strip().lower()
+        if choice not in ["y", "yes"]:
+            print("Skipping calibration. Using defaults.")
+            return
+
+        def curses_main(stdscr):
+            curses.curs_set(0)
+            stdscr.nodelay(False)
+            stdscr.timeout(-1)
+
+            for servo_name, value in self.servo_zero.items():
+                while True:
+                    stdscr.clear()
+                    stdscr.addstr(0, 0, f"Calibrating servo {servo_name.upper()}")
+                    stdscr.addstr(2, 0, "Use UP/DOWN arrows to adjust, ENTER to confirm.")
+                    stdscr.addstr(4, 0, f"Current value: {value:.1f}°")
+                    stdscr.refresh()
+
+                    key = stdscr.getch()
+                    if key == curses.KEY_UP:
+                        value += 1.0
+                        self.servos[servo_name].angle = value
+                    elif key == curses.KEY_DOWN:
+                        value -= 1.0
+                        self.servos[servo_name].angle = value
+                    elif key in [10, 13]:  # Enter key
+                        break
+
+                self.servo_zero[servo_name] = value
+
+        curses.wrapper(curses_main)
+        print("Calibration complete. Final values:")
+        print(self.servo_zero)
 
     def servo_callback(self, msg):
         try:
             # Extract angles from the incoming message
-            angle_fl = msg.data[1]
-            angle_fr = msg.data[3]
-            angle_rl = msg.data[9]
-            angle_rr = msg.data[11]
+            angle_fl = self.servo_zero["fl"] + msg.data[1]
+            angle_fr = self.servo_zero["fr"] + msg.data[3]
+            angle_rl = self.servo_zero["rl"] + msg.data[9]
+            angle_rr = self.servo_zero["rr"] + msg.data[11]
 
             # Clamp and set angles
             fl = self.clamp_angle(angle_fl * 180/300)
