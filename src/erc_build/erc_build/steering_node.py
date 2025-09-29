@@ -94,9 +94,9 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        node.wheel_pub.publish([0.0, node.servo_zero["fl"], 0.0, node.servo_zero["fr"], 0.0, 0.0, 0.0, 0.0, 0.0, node.servo_zero["rl"], 0.0, node.servo_zero["rr"]])  # Stop all wheels on shutdown
+        node.wheel_pub.publish([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])  # Stop all wheels on shutdown
     finally:
-        node.wheel_pub.publish([0.0, node.servo_zero["fl"], 0.0, node.servo_zero["fr"], 0.0, 0.0, 0.0, 0.0, 0.0, node.servo_zero["rl"], 0.0, node.servo_zero["rr"]])  # Stop all wheels on shutdown
+        node.wheel_pub.publish([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])  # Stop all wheels on shutdown
         node.destroy_node()
         rclpy.shutdown()
 
