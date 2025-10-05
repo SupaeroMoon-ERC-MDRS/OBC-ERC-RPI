@@ -54,7 +54,9 @@ class ServoSteeringNode(Node):
         }
 
         # self.calibrate_servos()
-        self.calib_pub.publish([self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]])
+        initial_calib = Float64MultiArray()
+        initial_calib.data = [self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]]
+        self.calib_pub.publish(initial_calib)
         self.get_logger().info('Servo Steering Node initialized.')
 
     def servo_calib_callback(self, msg):
@@ -67,7 +69,10 @@ class ServoSteeringNode(Node):
         #     self.servo_zero["rl"] = msg.data[2]
         # if msg.data[3] != 0:
         #     self.servo_zero["rr"] = msg.data[3]
-        self.calib_pub.publish([self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]])
+
+        calib_state = Float64MultiArray()
+        calib_state.data = [self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]]
+        self.calib_pub.publish(calib_state)
 
     def calibrate_servos(self):
         choice = input("Would you like to calibrate? [y/N] ").strip().lower()

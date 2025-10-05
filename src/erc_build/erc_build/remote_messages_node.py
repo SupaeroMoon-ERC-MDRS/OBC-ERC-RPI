@@ -5,8 +5,8 @@ import rclpy
 from rclpy.node import Node
 from raspistatechecker import RaspiStateChecker
 
-from std_msgs.msg import Float64, Bool
-from geometry_msgs.msg import Twist, Quaternion, Float64MultiArray
+from std_msgs.msg import Float64, Bool, Float64MultiArray
+from geometry_msgs.msg import Twist, Quaternion
 from nav_msgs.msg import Odometry
 import numpy as np
 
@@ -182,7 +182,7 @@ class RemoteComms(Node):
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode and False:
                     self.arm_command()
-                    
+
         self.res = self.servo_calib_handle.access(self.servo_calib)
         if self.res >= 1024:
             self.get_logger().error(f"Could not access servo_calib data, error code: {self.res}")
