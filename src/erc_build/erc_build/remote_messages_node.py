@@ -195,12 +195,7 @@ class RemoteComms(Node):
                 float(self.servo_calib.rl_calib),
                 float(self.servo_calib.rr_calib),
             ]
-            self.get_logger().info(f"Would send calib: {[
-                float(self.servo_calib.fl_calib),
-                float(self.servo_calib.fr_calib),
-                float(self.servo_calib.rl_calib),
-                float(self.servo_calib.rr_calib),
-            ]}")
+            self.get_logger().info(f"Would send calib: {[float(self.servo_calib.fl_calib), float(self.servo_calib.fr_calib), float(self.servo_calib.rl_calib), float(self.servo_calib.rr_calib)]}")
             # self.cmd_servo_calib_pub.publish(calib_command)
 
 
