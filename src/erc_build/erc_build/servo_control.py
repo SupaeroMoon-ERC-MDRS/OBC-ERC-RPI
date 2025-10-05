@@ -34,13 +34,13 @@ class ServoSteeringNode(Node):
             'rr': servo.Servo(self.pca.channels[0], min_pulse=500, max_pulse=2500)   # rear-right
         }
         self.servo_zero = {
-            "fl": 45.0,
-            "fr": 245.0,
-            "rl": 245.0,
-            "rr": 45.0
+            "fl": 44.0,
+            "fr": 261.0,
+            "rl": 247.0,
+            "rr": 41.0  
         }
 
-        self.calibrate_servos()
+        # self.calibrate_servos()
         self.get_logger().info('Servo Steering Node initialized.')
 
     def calibrate_servos(self):
