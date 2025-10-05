@@ -19,6 +19,19 @@ class ServoSteeringNode(Node):
             self.servo_callback,
             10
         )
+
+        self.calib_subscription = self.create_subscription(
+            Float64MultiArray,
+            '/wheel_controller/servo_calib_write',
+            self.servo_calib_callback,
+            10
+        )
+
+        self.calib_pub = self.create_publisher(
+            Float64MultiArray,
+            '/wheel_controller/servo_calib_read',
+            1
+        )
         
 
         # Setup I2C and PCA9685
@@ -41,7 +54,20 @@ class ServoSteeringNode(Node):
         }
 
         # self.calibrate_servos()
+        self.calib_pub.publish([self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]])
         self.get_logger().info('Servo Steering Node initialized.')
+
+    def servo_calib_callback(self, msg):
+        self.get_logger().info(f'Setting calib zeros: FL={msg.data[0]}, FR={msg.data[1]}, RL={msg.data[2]}, RR={msg.data[3]}')
+        # if msg.data[0] != 0:
+        #     self.servo_zero["fl"] = msg.data[0]
+        # if msg.data[1] != 0:
+        #     self.servo_zero["fr"] = msg.data[1]
+        # if msg.data[2] != 0:
+        #     self.servo_zero["rl"] = msg.data[2]
+        # if msg.data[3] != 0:
+        #     self.servo_zero["rr"] = msg.data[3]
+        self.calib_pub.publish([self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]])
 
     def calibrate_servos(self):
         choice = input("Would you like to calibrate? [y/N] ").strip().lower()
