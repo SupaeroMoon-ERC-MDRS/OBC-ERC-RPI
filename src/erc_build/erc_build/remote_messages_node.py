@@ -187,7 +187,7 @@ class RemoteComms(Node):
         if self.res >= 1024:
             self.get_logger().error(f"Could not access servo_calib data, error code: {self.res}")
             raise RetryWorthyException(f"ServoCalibState message access error {self.res} - retrying")
-        else:
+        elif self.res == 0:
             calib_command = Float64MultiArray()
             calib_command.data = [
                 float(self.servo_calib.fl_calib),
