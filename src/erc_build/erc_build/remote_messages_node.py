@@ -188,12 +188,20 @@ class RemoteComms(Node):
             self.get_logger().error(f"Could not access servo_calib data, error code: {self.res}")
             raise RetryWorthyException(f"ServoCalibState message access error {self.res} - retrying")
         else:
-            self.cmd_servo_calib_pub.publish([
+            calib_command = Float64MultiArray()
+            calib_command.data = [
                 float(self.servo_calib.fl_calib),
                 float(self.servo_calib.fr_calib),
                 float(self.servo_calib.rl_calib),
                 float(self.servo_calib.rr_calib),
-            ])
+            ]
+            self.get_logger().info(f"Would send calib: {[
+                float(self.servo_calib.fl_calib),
+                float(self.servo_calib.fr_calib),
+                float(self.servo_calib.rl_calib),
+                float(self.servo_calib.rr_calib),
+            ]}")
+            # self.cmd_servo_calib_pub.publish(calib_command)
 
 
     def __repr__(self):
