@@ -124,7 +124,13 @@ class RemoteComms(Node):
         self.nh.flush()
 
     def sendCalibState(self, msg):
-        pass
+        calib = ServoCalibState()
+        calib.fl_calib = msg[0]
+        calib.fr_calib = msg[1]
+        calib.rl_calib = msg[2]
+        calib.rr_calib = msg[3]
+        self.servo_calib_handle.update()
+        self.nh.pushServoCalibState()
 
     def remote_input(self):
         self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
