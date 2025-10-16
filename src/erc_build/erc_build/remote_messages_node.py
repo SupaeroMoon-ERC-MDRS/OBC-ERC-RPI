@@ -125,11 +125,11 @@ class RemoteComms(Node):
 
     def sendCalibState(self, msg):
         calib = ServoCalibState()
-        calib.fl_calib = msg[0]
-        calib.fr_calib = msg[1]
-        calib.rl_calib = msg[2]
-        calib.rr_calib = msg[3]
-        self.servo_calib_handle.update()
+        calib.fl_calib = int(msg.data[0])
+        calib.fr_calib = int(msg.data[1])
+        calib.rl_calib = int(msg.data[2])
+        calib.rr_calib = int(msg.data[3])
+        self.servo_calib_handle.update(calib)
         self.nh.pushServoCalibState()
 
     def remote_input(self):
@@ -201,8 +201,7 @@ class RemoteComms(Node):
                 float(self.servo_calib.rl_calib),
                 float(self.servo_calib.rr_calib),
             ]
-            self.get_logger().info(f"Would send calib: {[float(self.servo_calib.fl_calib), float(self.servo_calib.fr_calib), float(self.servo_calib.rl_calib), float(self.servo_calib.rr_calib)]}")
-            # self.cmd_servo_calib_pub.publish(calib_command)
+            self.cmd_servo_calib_pub.publish(calib_command)
 
 
     def __repr__(self):

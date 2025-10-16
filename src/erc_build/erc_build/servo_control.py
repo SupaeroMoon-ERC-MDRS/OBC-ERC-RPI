@@ -61,14 +61,14 @@ class ServoSteeringNode(Node):
 
     def servo_calib_callback(self, msg):
         self.get_logger().info(f'Setting calib zeros: FL={msg.data[0]}, FR={msg.data[1]}, RL={msg.data[2]}, RR={msg.data[3]}')
-        # if msg.data[0] != 0:
-        #     self.servo_zero["fl"] = msg.data[0]
-        # if msg.data[1] != 0:
-        #     self.servo_zero["fr"] = msg.data[1]
-        # if msg.data[2] != 0:
-        #     self.servo_zero["rl"] = msg.data[2]
-        # if msg.data[3] != 0:
-        #     self.servo_zero["rr"] = msg.data[3]
+        if msg.data[0] != 0:
+            self.servo_zero["fl"] = msg.data[0]
+        if msg.data[1] != 0:
+            self.servo_zero["fr"] = msg.data[1]
+        if msg.data[2] != 0:
+            self.servo_zero["rl"] = msg.data[2]
+        if msg.data[3] != 0:
+            self.servo_zero["rr"] = msg.data[3]
 
         calib_state = Float64MultiArray()
         calib_state.data = [self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]]
