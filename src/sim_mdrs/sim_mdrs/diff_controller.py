@@ -6,8 +6,8 @@ from std_msgs.msg import Float64MultiArray
 from tf_transformations import quaternion_from_euler
 import math
 
-ROVER_WHEEL_RADIUS = 0.19/2
-TRACK_WIDTH = 0.253  # Equivalent to d4 in your C++ code
+ROVER_WHEEL_RADIUS = 0.19/2 # Needs to be updated
+TRACK_WIDTH = 0.253  # Needs to be updated
 
 class DifferentialDriveController(Node):
     def __init__(self):
