@@ -19,6 +19,19 @@ class ServoSteeringNode(Node):
             self.servo_callback,
             10
         )
+
+        self.calib_subscription = self.create_subscription(
+            Float64MultiArray,
+            '/wheel_controller/servo_calib_write',
+            self.servo_calib_callback,
+            10
+        )
+
+        self.calib_pub = self.create_publisher(
+            Float64MultiArray,
+            '/wheel_controller/servo_calib_read',
+            1
+        )
         
 
         # Setup I2C and PCA9685
@@ -34,14 +47,32 @@ class ServoSteeringNode(Node):
             'rr': servo.Servo(self.pca.channels[0], min_pulse=500, max_pulse=2500)   # rear-right
         }
         self.servo_zero = {
-            "fl": 45.0,
-            "fr": 245.0,
-            "rl": 245.0,
-            "rr": 45.0
+            "fl": 44.0,
+            "fr": 261.0,
+            "rl": 247.0,
+            "rr": 41.0  
         }
 
-        self.calibrate_servos()
+        # self.calibrate_servos()
+        initial_calib = Float64MultiArray()
+        initial_calib.data = [self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]]
+        self.calib_pub.publish(initial_calib)
         self.get_logger().info('Servo Steering Node initialized.')
+
+    def servo_calib_callback(self, msg):
+        self.get_logger().info(f'Setting calib zeros: FL={msg.data[0]}, FR={msg.data[1]}, RL={msg.data[2]}, RR={msg.data[3]}')
+        if msg.data[0] != 0:
+            self.servo_zero["fl"] = msg.data[0]
+        if msg.data[1] != 0:
+            self.servo_zero["fr"] = msg.data[1]
+        if msg.data[2] != 0:
+            self.servo_zero["rl"] = msg.data[2]
+        if msg.data[3] != 0:
+            self.servo_zero["rr"] = msg.data[3]
+
+        calib_state = Float64MultiArray()
+        calib_state.data = [self.servo_zero["fl"],self.servo_zero["fr"],self.servo_zero["rl"],self.servo_zero["rr"]]
+        self.calib_pub.publish(calib_state)
 
     def calibrate_servos(self):
         choice = input("Would you like to calibrate? [y/N] ").strip().lower()

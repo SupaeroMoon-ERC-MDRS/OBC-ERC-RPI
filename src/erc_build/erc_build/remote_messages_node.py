@@ -1,11 +1,11 @@
 ## To create a ROS node to process incoming messages from the remote control
 """To be tested"""
-from udpcanpy import NetworkHandler, RemoteControl, RaspiState #to access the UPDCAN protocol
+from udpcanpy import NetworkHandler, RemoteControl, RaspiState, ServoCalibState #to access the UPDCAN protocol
 import rclpy
 from rclpy.node import Node
 from raspistatechecker import RaspiStateChecker
 
-from std_msgs.msg import Float64, Bool
+from std_msgs.msg import Float64, Bool, Float64MultiArray
 from geometry_msgs.msg import Twist, Quaternion
 from nav_msgs.msg import Odometry
 import numpy as np
@@ -32,6 +32,8 @@ class RemoteComms(Node):
         ## Create subscriptions and publishers
         self.cmd_vel_pub = self.create_publisher(msg_type=Twist,topic="/cmd_vel",qos_profile=10)
         self.cmd_arm_motion_pub = self.create_publisher(msg_type=Twist,topic="/cmd_move_arm",qos_profile=10)
+        self.cmd_servo_calib_pub = self.create_publisher(msg_type=Float64MultiArray,topic="/wheel_controller/servo_calib_write",qos_profile=10)
+        self.cmd_servo_calib_sub = self.create_subscription(msg_type=Float64MultiArray,topic="/wheel_controller/servo_calib_read",callback=self.sendCalibState,qos_profile=10)
         #self.cmd_arm_grip_pub = self.create_publisher(msg_type=Bool,topic="/cmd_grip_arm",qos_profile=10)
         # self.odom_sub = self.create_subscription(msg_type=Odometry,topic="/odom",callback = self.rec_odom ,qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
         """The queue size has been set to 10 for now, but it can be changed as necessary"""
@@ -70,6 +72,9 @@ class RemoteComms(Node):
         self.raspihandle = self.nh.getRaspiState()
         self.raspi = RaspiState()
         self.rsc = RaspiStateChecker()
+
+        self.servo_calib_handle = self.nh.getServoCalibState()
+        self.servo_calib = ServoCalibState()
         
         self.e_stop = False #creating emergency stop attribute so that we know when that's been pressed
 
@@ -118,7 +123,16 @@ class RemoteComms(Node):
 
         self.nh.flush()
 
-    def remote_input(self):        
+    def sendCalibState(self, msg):
+        calib = ServoCalibState()
+        calib.fl_calib = int(msg.data[0])
+        calib.fr_calib = int(msg.data[1])
+        calib.rl_calib = int(msg.data[2])
+        calib.rr_calib = int(msg.data[3])
+        self.servo_calib_handle.update(calib)
+        self.nh.pushServoCalibState()
+
+    def remote_input(self):
         self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
         if self.res >= 1024:
             self.get_logger().error(f"Could not access remote data, error code: {self.res}")
@@ -174,6 +188,20 @@ class RemoteComms(Node):
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode and False:
                     self.arm_command()
+
+        self.res = self.servo_calib_handle.access(self.servo_calib)
+        if self.res >= 1024:
+            self.get_logger().error(f"Could not access servo_calib data, error code: {self.res}")
+            raise RetryWorthyException(f"ServoCalibState message access error {self.res} - retrying")
+        elif self.res == 0:
+            calib_command = Float64MultiArray()
+            calib_command.data = [
+                float(self.servo_calib.fl_calib),
+                float(self.servo_calib.fr_calib),
+                float(self.servo_calib.rl_calib),
+                float(self.servo_calib.rr_calib),
+            ]
+            self.cmd_servo_calib_pub.publish(calib_command)
 
 
     def __repr__(self):

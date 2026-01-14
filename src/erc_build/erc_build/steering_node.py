@@ -29,10 +29,10 @@ class SixWheelFourWSController(Node):
         cmd = Float64MultiArray()
 
         # Default: no turning → all angles = 0
-        angle_fl = 0 #2
-        angle_fr = 0 #1
-        angle_rl = 0 #3
-        angle_rr = 0 #0 +ve CCW
+        angle_fl = 0.0 #2
+        angle_fr = 0.0 #1
+        angle_rl = 0.0 #3
+        angle_rr = 0.0 #0 +ve CCW
         vel_fl = vel_fr = vel_ml = vel_mr = vel_rl = vel_rr = 0.0
 
         if abs(angular_vel) > 1e-5 and abs(linear_vel) > 1e-1:
