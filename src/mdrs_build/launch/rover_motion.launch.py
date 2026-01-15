@@ -19,14 +19,6 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # Encoder-based odometry
-        Node(
-            package='mdrs_build',
-            executable='encoder_node',
-            name='encoder_node',
-            output='screen'
-        ),
-
         # Remote messages (e.g., joystick or high-level commands)
         # Node(
         #     package='mdrs_build',

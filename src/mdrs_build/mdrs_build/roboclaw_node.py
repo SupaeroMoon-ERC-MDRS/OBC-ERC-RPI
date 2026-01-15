@@ -3,6 +3,9 @@
 import rclpy
 from rclpy.node import Node
 from roboclaw_driver import Roboclaw
+from geometry_msgs.msg import Quaternion
+from nav_msgs.msg import Odometry
+from tf_transformations import quaternion_from_euler
 
 from std_msgs.msg import Float64MultiArray
 import numpy as np
@@ -15,6 +18,8 @@ class RoboclawNode(Node):
         self.subscription = self.create_subscription(Float64MultiArray, '/wheel_controller/commands',
             self.cmd_vel_motors, 10
         )
+        self.odom_pub = self.create_publisher(Odometry, '/enc_odom', 10)
+
 
         # logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -38,7 +43,6 @@ class RoboclawNode(Node):
         except Exception as e:
             self.get_logger().error("Could not connect to Roboclaw: %s", e)
             raise e
-        
 
         for address in self.addresses:
             try:
@@ -59,6 +63,23 @@ class RoboclawNode(Node):
         self.MAX_SPEED = 2.0  # to be tested
         # self.TICKS_PER_METER = 4342.2  # to be tested
         self.BASE_WIDTH = 0.33  # to be checked
+        self.TICKS_PER_METER = self.ticks_per_rev * self.gear_ratio / (2 * np.pi * self.wheel_radius)
+        self.GEAR_RATIO = 26.9
+
+        # Robot pose
+        self.x = 0.0
+        self.y = 0.0
+        self.theta = 0.0
+
+        # Encoder tracking
+        self.prev_left = 0
+        self.prev_right = 0
+        self.last_time = time.time()
+
+        # Initial encoder read
+        self.prev_left = self.get_average_encoder(side='left')
+        self.prev_right = self.get_average_encoder(side='right')
+
         self.last_set_speed_time = time.time()
         self.get_logger().info("Roboclaw Node Initialized")
 
@@ -96,6 +117,89 @@ class RoboclawNode(Node):
     def vel_to_qpps(self, vel):
         return int(vel * self.gear_ratio * self.conversion_factor * self.ticks_per_rev / (2 * np.pi * self.wheel_radius)) 
     # TODO: need clean shutdown so motors stop even if new msgs are arriving
+
+    def get_average_encoder(self, side='left'):
+        encoders = []
+        for _, addr in enumerate(self.addresses):
+            if side == 'left':
+                result = self.robo.ReadEncM2(addr)
+            else:
+                result = self.robo.ReadEncM1(addr)
+            if result[0]:  # success
+                encoders.append(result[1])
+        return np.mean(encoders) if encoders else 0
+
+    def get_single_encoder(self, side='left', addr=130):
+        self.get_logger().info(f"Getting encoder for side {side} at address {addr}")
+
+        encoders = []
+        # for i, addr in enumerate(self.addresses):
+        if side == 'left':
+            result = self.robo.ReadEncM2(addr)
+        else:
+            result = self.robo.ReadEncM1(addr)
+        if result[0]:  # success
+            encoders.append(result[1])
+        else:
+            self.get_logger().info(f"Failed to get encoder values.")
+        return np.mean(encoders) if encoders else 0
+    
+    def update_odometry(self):
+        current_time = time.time()
+        dt = current_time - self.last_time
+        self.last_time = current_time
+
+        # Get current encoder readings
+        left_ticks = self.get_single_encoder('left', 130)
+        right_ticks = self.get_single_encoder('right', 130)
+
+        delta_left = (left_ticks - self.prev_left) / self.TICKS_PER_METER
+        delta_right = (right_ticks - self.prev_right) / self.TICKS_PER_METER
+
+        self.prev_left = left_ticks
+        self.prev_right = right_ticks
+
+        # Compute odometry
+        delta_s = (delta_right + delta_left) / 2.0
+        delta_theta = (delta_right - delta_left) / self.BASE_WIDTH
+
+        if abs(delta_theta) < 1e-6:
+            delta_x = delta_s * np.cos(self.theta)
+            delta_y = delta_s * np.sin(self.theta)
+        else:
+            radius = delta_s / delta_theta
+            delta_x = radius * (np.sin(self.theta + delta_theta) - np.sin(self.theta))
+            delta_y = -radius * (np.cos(self.theta + delta_theta) - np.cos(self.theta))
+
+        self.x += delta_x
+        self.y += delta_y
+        self.theta += delta_theta
+        self.theta = self.normalize_angle(self.theta)
+
+        # Publish odometry message
+        odom_msg = Odometry()
+        odom_msg.header.stamp = self.get_clock().now().to_msg()
+        odom_msg.header.frame_id = "odom"
+        odom_msg.child_frame_id = "base_footprint"
+
+        odom_msg.pose.pose.position.x = self.x
+        odom_msg.pose.pose.position.y = self.y
+        odom_msg.pose.pose.position.z = 0.0
+
+        quat = quaternion_from_euler(0, 0, self.theta)
+        odom_msg.pose.pose.orientation = Quaternion(x=quat[0], y=quat[1], z=quat[2], w=quat[3])
+
+        odom_msg.twist.twist.linear.x = delta_s / dt if dt > 0 else 0.0
+        odom_msg.twist.twist.angular.z = delta_theta / dt if dt > 0 else 0.0
+
+        self.odom_pub.publish(odom_msg)
+
+    def normalize_angle(self, angle):
+        while angle > np.pi:
+            angle -= 2.0 * np.pi
+        while angle < -np.pi:
+            angle += 2.0 * np.pi
+        return angle
 
     def shutdown(self):
         self.get_logger().info("Shutting down")
