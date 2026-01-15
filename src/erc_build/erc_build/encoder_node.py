@@ -71,8 +71,8 @@ class EncoderNode(Node):
         self.last_time = current_time
 
         # Get current encoder readings
-        left_ticks = self.get_average_encoder('left')
-        right_ticks = self.get_average_encoder('right')
+        left_ticks = self.get_single_encoder('left', 130)
+        right_ticks = self.get_single_encoder('right', 130)
 
         delta_left = (left_ticks - self.prev_left) / self.TICKS_PER_METER
         delta_right = (right_ticks - self.prev_right) / self.TICKS_PER_METER
