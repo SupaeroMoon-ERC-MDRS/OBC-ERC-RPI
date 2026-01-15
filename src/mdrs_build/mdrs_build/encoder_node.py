@@ -54,14 +54,25 @@ class EncoderNode(Node):
                 encoders.append(result[1])
         return np.mean(encoders) if encoders else 0
 
+    def get_single_encoder(self, side='left', addr=130):
+        encoders = []
+        # for i, addr in enumerate(self.addresses):
+        if side == 'left':
+            result = self.roboclaw.ReadEncM2(addr)
+        else:
+            result = self.roboclaw.ReadEncM1(addr)
+        if result[0]:  # success
+            encoders.append(result[1])
+        return np.mean(encoders) if encoders else 0
+    
     def update_odometry(self):
         current_time = time.time()
         dt = current_time - self.last_time
         self.last_time = current_time
 
         # Get current encoder readings
-        left_ticks = self.get_average_encoder('left')
-        right_ticks = self.get_average_encoder('right')
+        left_ticks = self.get_single_encoder('left', 130)
+        right_ticks = self.get_single_encoder('right', 130)
 
         delta_left = (left_ticks - self.prev_left) / self.TICKS_PER_METER
         delta_right = (right_ticks - self.prev_right) / self.TICKS_PER_METER
