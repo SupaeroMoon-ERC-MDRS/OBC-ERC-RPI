@@ -31,11 +31,11 @@ def generate_launch_description():
             executable='remote_messages_node',
             name='remote_messages_node',
             output='screen'
-        ),
-        Node(
-            package='mdrs_build',
-            executable='servo_control',
-            name='servo_control',
-            output='screen'
-        ),
+        )
+        # Node(
+        #     package='mdrs_build',
+        #     executable='servo_control',
+        #     name='servo_control',
+        #     output='screen'
+        # ),
     ])
