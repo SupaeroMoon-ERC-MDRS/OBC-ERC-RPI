@@ -39,23 +39,12 @@ class IKServoController(Node):
         self.base = servo.Servo(self.pca.channels[8], min_pulse=500, max_pulse=2500)
         self.theta_1 = servo.Servo(self.pca.channels[9], min_pulse=500, max_pulse=2500)
         self.theta_2 = servo.Servo(self.pca.channels[10], min_pulse=500, max_pulse=2500)
-        self.wrist_link = servo.Servo(self.pca.channels[11], min_pulse=500, max_pulse=2500)
-        self.wrist_rot = servo.Servo(self.pca.channels[4], min_pulse=500, max_pulse=2500)
         self.gripper = servo.Servo(self.pca.channels[5], min_pulse=500, max_pulse=2500)
-        
-
-        # # Delete this to test physically
-        # self.base = 0
-        # self.theta_1 = 0
-        # self.theta_2 = 0
-        # self.wrist_link = 0
-        # self.wrist_rot = 0
-        # self.gripper = 0
 
         # Arm lengths
-        self.l1 = 0.1752
-        self.l2 = 0.16089
-        self.l3 = 0.21823
+        self.l1 = 0.13814
+        self.l2 = 0.179
+        self.l3 = 0.19272
 
         self.get_logger().info("IK Servo Controller node started.")
 
@@ -111,12 +100,13 @@ class IKServoController(Node):
 
 
     def compute_ik(self, x, y):
-        d = (x**2 + y**2 - self.l1**2 - self.l2**2) / (2 * self.l1 * self.l2)
+        y = y - self.l1  # Adjust for base height
+        d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
 
         if abs(d) > 1.0:
             return None
         q2 = math.acos(d)
-        q1 = math.atan2(y, x) - math.atan2(self.l2 * math.sin(q2), self.l1 + self.l2 * math.cos(q2))
+        q1 = math.atan2(y, x) - math.atan2(self.l2 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
         return q1, q2
