@@ -186,13 +186,13 @@ class RemoteComms(Node):
 
                 if not self.arm_mode:
                     if [self.LT,self.LB,self.LL,self.LR,self.RB] != self.prev_cmd or rThumbChange or lThumbChange:
-                        self.get_logger().info(f"Received command")
-                        self.print_remote_data()
+                        self.get_logger().info(f"Received ROVER command")
+                        # self.print_remote_data()
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode:
-                    self.get_logger().info(f"Received command")
-                    self.print_remote_data()
+                    self.get_logger().info(f"Received ARM command")
+                    # self.print_remote_data()
                     self.arm_command()
 
         self.res = self.servo_calib_handle.access(self.servo_calib)
@@ -278,9 +278,9 @@ class RemoteComms(Node):
         self.ang_speed = max(min(self.ang_speed, self.max_ang_speed), -self.max_ang_speed)
 
         #print to debug
-        self.get_logger().debug(f"speeds calculated to send: {self.lin_speed,self.ang_speed}")
+        self.get_logger().info(f"speeds calculated to send: {self.lin_speed,self.ang_speed}")
         #print to debug
-        self.get_logger().debug(f"speeds being sent: {self.lin_speed,self.ang_speed}")
+        self.get_logger().info(f"speeds being sent: {self.lin_speed,self.ang_speed}")
         if self.RB: #normal stop button - values reset to zero before creating and publishing Twist
             self.lin_speed = 0.0
             self.ang_speed = 0.0
@@ -314,7 +314,7 @@ class RemoteComms(Node):
             self.end_grip = 1.0
 
         #print to debug
-        self.get_logger().debug(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
+        self.get_logger().info(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
 
         arm_cmd.linear.x = self.lin_x
         arm_cmd.linear.y = self.lin_y
