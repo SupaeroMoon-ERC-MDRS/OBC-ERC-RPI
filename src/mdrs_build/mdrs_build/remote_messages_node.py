@@ -179,6 +179,7 @@ class RemoteComms(Node):
                 if self.L1 and self.R1:
                     if [self.L1,self.R1] != self.prev_toggle:
                         self.arm_mode = not self.arm_mode
+                        self.get_logger().info("Toggling arm mode to " + str(self.arm_mode))
                 
                 self.prev_toggle = [self.L1,self.R1]
 
@@ -189,6 +190,8 @@ class RemoteComms(Node):
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode:
+                    self.get_logger().info(f"Received command")
+                    self.print_remote_data()
                     self.arm_command()
 
         self.res = self.servo_calib_handle.access(self.servo_calib)
