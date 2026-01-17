@@ -31,7 +31,7 @@ class RoboclawNode(Node):
         self.addresses = [int(128), int(129), int(130)]  # change
         self.gear_ratio = 50
         self.wheel_radius = 0.1/2
-        self.ticks_per_rev = 64*self.gear_ratio  # 64 for 100kV motors with encoders
+        self.ticks_per_rev = 64*self.gear_ratio
         self.conversion_factor = 1/50
         self.accel = int(16383/2)
 
@@ -139,10 +139,7 @@ class RoboclawNode(Node):
             result = self.robo.ReadEncM2(addr)
             self.get_logger().info(f"Got right encoder values: {result}")
         if result[1]:  # success
-            if result[1] == 128:
-                return result[0]
-            if result[1] == 130:
-                return -result[0]
+            return result[0]
         else:
             self.get_logger().info(f"Failed to get encoder values.")
             return 0
