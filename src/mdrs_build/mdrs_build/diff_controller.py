@@ -51,7 +51,7 @@ class DifferentialDriveController(Node):
 
     def publish_wheel_commands(self):
         wheel_msg = Float64MultiArray()
-        wheel_msg.data = [self.fl, self.fr, self.rl, self.rr, self.ml, self.mr]
+        wheel_msg.data = [self.lf, self.rf, self.lr, self.rr, self.lm, self.rm]
         self.motor_wheel_pub.publish(wheel_msg)
 
     def calculate_wheel_speeds(self, base_speed, turn_radius):
@@ -91,8 +91,8 @@ class DifferentialDriveController(Node):
         
         # Average all wheels on each side
         # Assuming you have: left_front_vel, left_middle_vel, left_rear_vel, etc.
-        left_avg_vel = (self.left_front_vel + self.left_middle_vel + self.left_rear_vel) / 3.0
-        right_avg_vel = (self.right_front_vel + self.right_middle_vel + self.right_rear_vel) / 3.0
+        left_avg_vel = (self.lf + self.lm + self.lr) / 3.0
+        right_avg_vel = (self.rf + self.rm + self.rr) / 3.0
         
         # Calculate velocities from wheel velocities
         linear_velocity = (left_avg_vel + right_avg_vel) * ROVER_WHEEL_RADIUS / 2.0
@@ -106,7 +106,7 @@ class DifferentialDriveController(Node):
         # Create and publish odometry message
         odom_msg = Odometry()
         odom_msg.header.stamp = current_time.to_msg()
-        odom_msg.header.frame_id = 'odom'
+        odom_msg.header.frame_id = 'odom_sim'
         odom_msg.child_frame_id = 'base_footprint'
         
         odom_msg.pose.pose.position.x = self.x_position
