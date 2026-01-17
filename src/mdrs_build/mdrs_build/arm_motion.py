@@ -1,8 +1,6 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from adafruit_servokit import ServoKit  # Example; replace with your actual hardware library
-import numpy as np
 import math
 # Init Adafruit PCA9685
 from adafruit_pca9685 import PCA9685
@@ -19,8 +17,6 @@ class IKServoController(Node):
         self.base_curr = 0.0
         self.theta_1_curr = 150.0
         self.theta_2_curr = 150.0
-        self.wrist_link_curr = 150.0
-        self.wrist_rot_curr = 0.0
         self.gripper_curr = 90.0
 
         self.subscription = self.create_subscription(
@@ -36,10 +32,10 @@ class IKServoController(Node):
         self.pca.frequency = 50
 
         # Create servo objects
-        self.base = servo.Servo(self.pca.channels[8], min_pulse=500, max_pulse=2500)
-        self.theta_1 = servo.Servo(self.pca.channels[9], min_pulse=500, max_pulse=2500)
-        self.theta_2 = servo.Servo(self.pca.channels[10], min_pulse=500, max_pulse=2500)
-        self.gripper = servo.Servo(self.pca.channels[5], min_pulse=500, max_pulse=2500)
+        self.base = servo.Servo(self.pca.channels[8], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.theta_1 = servo.Servo(self.pca.channels[9], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.theta_2 = servo.Servo(self.pca.channels[10], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.gripper = servo.Servo(self.pca.channels[5], actuation_range=270, min_pulse=500, max_pulse=2500)
 
         # Arm lengths
         self.l1 = 0.13814
@@ -49,58 +45,30 @@ class IKServoController(Node):
         self.get_logger().info("IK Servo Controller node started.")
 
     def cmd_callback(self, msg):
-        # if abs(msg.linear.x) > 1e-4 or abs(msg.linear.y) > 1e-4:
-        #     dx = msg.linear.x * 0.01
-        #     dy = msg.linear.y * 0.01
-
-        #     new_x = self.current_x + dx
-        #     new_y = self.current_y + dy
-
-        #     result = self.compute_ik(new_x, new_y)
-
-        #     if result:
-        #         q1, q2 = result
-        #         self.send_to_servo(q1, self.theta_1)
-        #         self.send_to_servo(q2, self.theta_2)
-        #         self.current_x += dx
-        #         self.current_y += dy
-        #     else:
-        #         self.get_logger().warn(f"Unreachable target: ({new_x:.2f}, {new_y:.2f})")
-        if abs(msg.linear.x) > 1e-4: # open/close grip
+        if abs(msg.linear.x) > 1e-4:
             dz = msg.linear.x * 3
-            self.theta_1_curr += dz
-            self.send_to_servo(self.theta_1_curr, self.theta_1)
-            # TODO: Implement servo limits
-        if abs(msg.linear.y) > 1e-4: # open/close grip
+            self.current_x += dz
+            self.compute_ik()
+
+        if abs(msg.linear.y) > 1e-4:
             dz = msg.linear.y * 3
-            self.theta_2_curr += dz
-            self.send_to_servo(self.theta_2_curr, self.theta_2)
-            # TODO: Implement servo limits
+            self.current_y += dz
+            self.compute_ik()
 
-        if abs(msg.linear.z) > 1e-4: # open/close grip
-            dz = msg.linear.z * 3
-            self.gripper_curr += dz
-            self.send_to_servo(self.gripper_curr, self.gripper)
-            # TODO: Implement servo limits
-
-        if abs(msg.angular.x) > 1e-4: # rotate base
+        if abs(msg.angular.x) > 1e-4:
             dtheta = msg.angular.x * 10
             self.base_curr += dtheta
             self.send_to_servo(self.base_curr, self.base)
 
-        if abs(msg.angular.y) > 1e-4: # rotate arm
-            dtheta = msg.angular.y * 10
-            self.wrist_rot_curr += dtheta
-            self.send_to_servo(self.wrist_rot_curr, self.wrist_rot)
-
-        if abs(msg.angular.z) > 1e-4: # tilt wrist
-            dtheta = msg.angular.z * 2
-            self.wrist_link_curr += dtheta
-            self.send_to_servo(self.wrist_link_curr, self.wrist_link)
+        if abs(msg.angular.z) > 1e-4:
+            dz = msg.angular.z * 3
+            self.gripper_curr += dz
+            self.send_to_servo(self.gripper_curr, self.gripper)
 
 
-    def compute_ik(self, x, y):
-        y = y - self.l1  # Adjust for base height
+    def compute_ik(self):
+        y = self.current_y - self.l1  # Adjust for base height
+        x = self.current_x
         d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
 
         if abs(d) > 1.0:
@@ -109,6 +77,11 @@ class IKServoController(Node):
         q1 = math.atan2(y, x) - math.atan2(self.l2 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
+        self.theta_1_curr = q1
+        self.theta_2_curr = q2
+        self.send_to_servo(self.theta_1_curr, self.theta_1)
+        self.send_to_servo(self.theta_2_curr, self.theta_2)
+
         return q1, q2
 
     def send_to_servo(self, q1, servo1):
@@ -118,6 +91,13 @@ class IKServoController(Node):
 
         self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
         servo1.angle = a1
+        
+    def go_home(self):
+        self.get_logger().info("Returning to home position.")
+        self.send_to_servo(0.0, self.base)
+        self.send_to_servo(150.0, self.theta_1)
+        self.send_to_servo(150.0, self.theta_2)
+        self.send_to_servo(90.0, self.gripper)
 
 
 def main(args=None):
@@ -128,6 +108,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        inv_kin.go_home()
         inv_kin.destroy_node()
         rclpy.shutdown()
 
