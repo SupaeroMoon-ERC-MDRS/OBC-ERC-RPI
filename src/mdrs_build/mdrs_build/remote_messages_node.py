@@ -96,6 +96,7 @@ class RemoteComms(Node):
         # setting max limits
         self.max_lin_speed = 9.0
         self.max_ang_speed = 10.0
+        self.max_angle = 90.0
 
         # toggle for arm mode
         self.prev_toggle = [None, None]
@@ -293,40 +294,30 @@ class RemoteComms(Node):
     def arm_command(self):
         
         arm_cmd = Twist()
-                # #stop button # R1
-        if self.R1:
-            self.lin_x = 0.0 #forward/back
-            self.lin_y = 0.0 
-            self.end_grip = 0.0 
-            self.base = 0.0 
-            #print to debug
-            self.get_logger().debug(f"arm commands being sent: {self.lin_x,self.lin_y,self.base,self.end_grip}")
 
-        else:
+        self.lin_x = 0.0 #forward/back
+        self.lin_y = 0.0 #up/down
+        self.base = 0.0 #gripper open/close
+        self.end_grip = 0.0 #wrist rotation
 
-            self.lin_x = 0.0 #forward/back
-            self.lin_y = 0.0 #up/down
-            self.base = 0.0 #gripper open/close
-            self.end_grip = 0.0 #wrist rotation
+        if self.ThumbLX:
+            self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_angle
+        if self.ThumbLY:
+            self.lin_y = self.thumb_curve(self.ThumbLY) * self.max_angle
+        if self.LL: # arm base left
+            self.base = 1.0
+        elif self.LR: # arm base right
+            self.base = -1.0
+        if self.LB: # grip open
+            self.end_grip = -1.0
+        elif self.LT: # grip close
+            self.end_grip = 1.0
 
-            if self.ThumbLX:
-                self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_ang_speed
-            if self.ThumbLY:
-                self.lin_y = self.thumb_curve(self.ThumbLY) * self.max_lin_speed
-            if self.LL: # arm base left
-                self.base = 1.0
-            elif self.LR: # arm base right
-                self.base = -1.0
-            if self.LB: # grip open
-                self.end_grip = -1.0
-            elif self.LT: # grip close
-                self.end_grip = 1.0
-    
-            #print to debug
-            self.get_logger().debug(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
+        #print to debug
+        self.get_logger().debug(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
 
-        arm_cmd.linear.x = self.lin_speed
-        arm_cmd.linear.y = self.ang_speed
+        arm_cmd.linear.x = self.lin_x
+        arm_cmd.linear.y = self.lin_y
         arm_cmd.linear.z = self.end_grip
         arm_cmd.angular.x = self.base
         arm_cmd.angular.y = 0.0
