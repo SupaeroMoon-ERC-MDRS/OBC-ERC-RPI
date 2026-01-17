@@ -32,10 +32,10 @@ class IKServoController(Node):
         self.pca.frequency = 50
 
         # Create servo objects
-        self.base = servo.Servo(self.pca.channels[8], actuation_range=270, min_pulse=500, max_pulse=2500)
-        self.theta_1 = servo.Servo(self.pca.channels[9], actuation_range=270, min_pulse=500, max_pulse=2500)
-        self.theta_2 = servo.Servo(self.pca.channels[10], actuation_range=270, min_pulse=500, max_pulse=2500)
-        self.gripper = servo.Servo(self.pca.channels[5], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.base = servo.Servo(self.pca.channels[0], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.theta_1 = servo.Servo(self.pca.channels[1], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.theta_2 = servo.Servo(self.pca.channels[2], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.gripper = servo.Servo(self.pca.channels[3], actuation_range=270, min_pulse=500, max_pulse=2500)
 
         # Arm lengths
         self.l1 = 0.13814
@@ -91,7 +91,7 @@ class IKServoController(Node):
 
         self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
         servo1.angle = a1
-        
+
     def go_home(self):
         self.get_logger().info("Returning to home position.")
         self.send_to_servo(0.0, self.base)
