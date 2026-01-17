@@ -31,7 +31,7 @@ class RoboclawNode(Node):
         self.addresses = [int(128), int(129), int(130)]  # change
         self.gear_ratio = 50
         self.wheel_radius = 0.1/2
-        self.ticks_per_rev = 64*self.gear_ratio
+        self.ticks_per_rev = 2847
         self.conversion_factor = 1/50
         self.accel = int(16383/2)
 
@@ -60,11 +60,10 @@ class RoboclawNode(Node):
             self.robo.ForwardM2(address, 0)
             self.robo.ResetEncoders(address)
 
-        self.MAX_SPEED = 2.0  # to be tested
         # self.TICKS_PER_METER = 4342.2  # to be tested
-        self.BASE_WIDTH = 0.33  # to be checked
-        self.TICKS_PER_METER = self.ticks_per_rev * self.gear_ratio / (2 * np.pi * self.wheel_radius)
-        self.GEAR_RATIO = 26.9
+        self.BASE_WIDTH = 0.446  # to be checked
+        self.ticks_per_meter = self.ticks_per_rev / (2 * np.pi * self.wheel_radius)
+        # 509554
 
         # Robot pose
         self.x = 0.0
