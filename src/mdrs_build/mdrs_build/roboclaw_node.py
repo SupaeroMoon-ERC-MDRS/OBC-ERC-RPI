@@ -77,8 +77,8 @@ class RoboclawNode(Node):
         self.last_time = time.time()
 
         # Initial encoder read
-        self.prev_left = self.get_average_encoder(side='left')
-        self.prev_right = self.get_average_encoder(side='right')
+        self.prev_left = self.get_single_encoder(side='left', addr=130)
+        self.prev_right = self.get_single_encoder(side='right', addr=130)
 
         self.last_set_speed_time = time.time()
         self.get_logger().info("Roboclaw Node Initialized")
@@ -109,7 +109,7 @@ class RoboclawNode(Node):
 
                 # Update timestamp
                 self.last_set_speed_time = time.time()
-
+            self.update_odometry()
         except Exception as e:
             self.get_logger().error(f"Motor command failed: {str(e)}")
             self.shutdown()
@@ -136,8 +136,10 @@ class RoboclawNode(Node):
         # for i, addr in enumerate(self.addresses):
         if side == 'left':
             result = self.robo.ReadEncM2(addr)
+            self.get_logger().info(f"Got left encoder values: {result}")
         else:
             result = self.robo.ReadEncM1(addr)
+            self.get_logger().info(f"Got right encoder values: {result}")
         if result[0]:  # success
             encoders.append(result[1])
         else:
