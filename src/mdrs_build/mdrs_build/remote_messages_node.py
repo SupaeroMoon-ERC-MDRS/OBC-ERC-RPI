@@ -97,6 +97,9 @@ class RemoteComms(Node):
         self.max_lin_speed = 9.0
         self.max_ang_speed = 10.0
 
+        # toggle for arm mode
+        self.prev_toggle = [None, None]
+
         ##initialise arm control variables
         #initial motion directions
         self.lin_x = 0.0 #forward/back
@@ -185,7 +188,7 @@ class RemoteComms(Node):
                         self.print_remote_data()
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
-                elif self.arm_mode and False:
+                elif self.arm_mode:
                     self.arm_command()
 
         self.res = self.servo_calib_handle.access(self.servo_calib)

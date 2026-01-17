@@ -36,6 +36,7 @@ setup(
             'remote_messages_node = mdrs_build.remote_messages_node:main',
             'servo_control = mdrs_build.servo_control:main',
             'keyboard_control = mdrs_build.keyboard_control:main',
+            'arm_motion = mdrs_build.arm_motion:main',
         ],
     },
 )
