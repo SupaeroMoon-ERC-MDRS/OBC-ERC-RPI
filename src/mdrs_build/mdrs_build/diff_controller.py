@@ -59,7 +59,7 @@ class DifferentialDriveController(Node):
             R = float('inf')
         
         # Handle special cases
-        if abs(base_speed) < 0.001:  # Pivot turn
+        if abs(base_speed) < 0.001 and R != float('inf'):  # Pivot turn
             # For pivot, just use differential speeds
             self.get_logger().info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             self.get_logger().info(f"STARTING PIVOT TURN at speed {angular_velocity}")
