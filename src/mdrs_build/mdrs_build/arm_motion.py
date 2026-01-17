@@ -21,7 +21,7 @@ class IKServoController(Node):
 
         self.subscription = self.create_subscription(
             Twist,
-            '/cmd_vel',
+            '/cmd_move_arm',
             self.cmd_callback,
             10
         )

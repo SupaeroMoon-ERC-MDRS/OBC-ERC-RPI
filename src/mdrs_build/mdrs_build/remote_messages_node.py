@@ -99,11 +99,10 @@ class RemoteComms(Node):
 
         ##initialise arm control variables
         #initial motion directions
-        self.arm_x = 0.0 #forward/back
-        self.arm_z = 0.0 #up/down
-        self.arm_theta = 0.0 #arm swivel
-        self.end_theta = 0.0 #gripper (end-vector) rotation
-        self.end_grip = False #gripper grab or not
+        self.lin_x = 0.0 #forward/back
+        self.lin_y = 0.0 #up/down
+        self.base = 0.0 #gripper open/close
+        self.end_grip = 0.0 #wrist rotation
 
         self.ThumbLX = 127.0
         self.ThumbLY = 127.0
@@ -288,67 +287,46 @@ class RemoteComms(Node):
     def arm_command(self):
         
         arm_cmd = Twist()
-
-        self.arm_x = 0.0 #forward/back
-        self.arm_y = 0.0 #up/down
-        self.end_grip = 0.0 #gripper open/close
-        self.arm_theta = 0.0 #arm swivel
-        self.wrist_theta = 0.0 #wrist rotation
-        self.last_link = 0.0 #last link (wrist up/down?)
-
-        # Left analog stick up/down for forward/back
-        if self.ThumbLY <= 5:
-            self.arm_x = 1.0
-        elif self.ThumbLY >= 250:
-            self.arm_x = -1.0
-        # Right analog stick up/down for up/down
-        if self.ThumbRY <= 5:
-            self.arm_y = 1.0
-        elif self.ThumbRY >= 250:
-            self.arm_y = -1.0
-        # X and ∆ buttons on right for gripper closed/open
-        if self.RT:
-            self.end_grip = 1.0
-        elif self.RB:
-            self.end_grip = -1.0
-        # Left analog stick right/left for rotation
-        if self.ThumbLX <= 5: #left
-            self.arm_theta = 1.0 #positive usually means CCW by RH rule
-        elif self.ThumbLX >= 250: #right
-            self.arm_theta = -1.0
-        # Right analog stick right/left for wrist rotation
-        if self.ThumbRX <= 5: #
-            self.wrist_theta = 1.0 #
-        elif self.ThumbRX >= 250: #
-            self.wrist_theta = -1.0
-        # up/down direction buttons on the left for wrist up/down
-        if self.LT:
-            self.last_link = 1.0
-        elif self.LB:
-            self.last_link = -1.0
-
-        #print to debug
-        self.get_logger().debug(f"arm commands to send: {self.arm_x, self.arm_z}")
-        # #stop button # R1
+                # #stop button # R1
         if self.R1:
-            self.arm_x = 0.0 #forward/back
-            self.arm_y = 0.0 
+            self.lin_x = 0.0 #forward/back
+            self.lin_y = 0.0 
             self.end_grip = 0.0 
-            self.arm_theta = 0.0 
-            self.wrist_theta = 0.0 
-            self.last_link = 0.0
+            self.base = 0.0 
+            #print to debug
+            self.get_logger().debug(f"arm commands being sent: {self.lin_x,self.lin_y,self.base,self.end_grip}")
 
+        else:
 
-        #print to debug
-        self.get_logger().debug(f"arm commands being sent: {self.arm_x,self.arm_z}")
+            self.lin_x = 0.0 #forward/back
+            self.lin_y = 0.0 #up/down
+            self.base = 0.0 #gripper open/close
+            self.end_grip = 0.0 #wrist rotation
 
-        arm_cmd.linear.x = self.arm_x #x is forward/back
-        arm_cmd.linear.y = self.arm_y #y is up/down
+            if self.ThumbLX:
+                self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_ang_speed
+            if self.ThumbLY:
+                self.lin_y = self.thumb_curve(self.ThumbLY) * self.max_lin_speed
+            if self.LL: # arm base left
+                self.base = 1.0
+            elif self.LR: # arm base right
+                self.base = -1.0
+            if self.LB: # grip open
+                self.end_grip = -1.0
+            elif self.LT: # grip close
+                self.end_grip = 1.0
+    
+            #print to debug
+            self.get_logger().debug(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
+
+        arm_cmd.linear.x = self.lin_speed
+        arm_cmd.linear.y = self.ang_speed
         arm_cmd.linear.z = self.end_grip
-        arm_cmd.angular.x = self.arm_theta
-        arm_cmd.angular.y = self.wrist_theta
-        arm_cmd.angular.z = self.last_link
+        arm_cmd.angular.x = self.base
+        arm_cmd.angular.y = 0
+        arm_cmd.angular.z = 0
         self.cmd_arm_motion_pub.publish(arm_cmd)
+        return
 
     
     def emergency_stop(self, direct = True):
