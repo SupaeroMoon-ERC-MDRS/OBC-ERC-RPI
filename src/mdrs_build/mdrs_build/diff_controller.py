@@ -55,13 +55,16 @@ class DifferentialDriveController(Node):
         self.motor_wheel_pub.publish(wheel_msg)
 
     def calculate_wheel_speeds(self, base_speed, turn_radius):
-        L = WHEEL_BASE  # distance to front/rear from center
+        L = WHEEL_BASE  # distance to front or rear from center
         W = TRACK_WIDTH
         R = turn_radius
         
         # Handle special cases
         if abs(R) < 0.001:  # Pivot turn
             # For pivot, just use differential speeds
+            self.get_logger().info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            self.get_logger().info("STARTING PIVOT TURN")
+            self.get_logger().info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             left_vel = -base_speed
             right_vel = base_speed
             return (left_vel, left_vel, left_vel, right_vel, right_vel, right_vel)
