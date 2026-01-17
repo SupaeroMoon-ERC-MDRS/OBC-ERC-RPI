@@ -132,19 +132,21 @@ class RoboclawNode(Node):
     def get_single_encoder(self, side='left', addr=130):
         self.get_logger().info(f"Getting encoder for side {side} at address {addr}")
 
-        encoders = []
         # for i, addr in enumerate(self.addresses):
         if side == 'left':
-            result = self.robo.ReadEncM2(addr)
+            result = self.robo.ReadEncM1(addr)
             self.get_logger().info(f"Got left encoder values: {result}")
         else:
-            result = self.robo.ReadEncM1(addr)
+            result = self.robo.ReadEncM2(addr)
             self.get_logger().info(f"Got right encoder values: {result}")
-        if result[0]:  # success
-            encoders.append(result[1])
+        if result[1]:  # success
+            if result[1] == 128:
+                return result[0]
+            if result[1] == 130:
+                return -result[0]
         else:
             self.get_logger().info(f"Failed to get encoder values.")
-        return np.mean(encoders) if encoders else 0
+            return 0
     
     def update_odometry(self):
         current_time = time.time()
