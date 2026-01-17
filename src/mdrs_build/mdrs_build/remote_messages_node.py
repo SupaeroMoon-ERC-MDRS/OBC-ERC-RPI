@@ -326,8 +326,8 @@ class RemoteComms(Node):
         arm_cmd.linear.y = self.ang_speed
         arm_cmd.linear.z = self.end_grip
         arm_cmd.angular.x = self.base
-        arm_cmd.angular.y = 0
-        arm_cmd.angular.z = 0
+        arm_cmd.angular.y = 0.0
+        arm_cmd.angular.z = 0.0
         self.cmd_arm_motion_pub.publish(arm_cmd)
         return
 
