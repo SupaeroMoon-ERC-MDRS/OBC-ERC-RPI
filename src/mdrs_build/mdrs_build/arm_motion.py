@@ -46,14 +46,24 @@ class IKServoController(Node):
 
     def cmd_callback(self, msg):
         if abs(msg.linear.x) > 1e-4:
-            dz = msg.linear.x * 3
-            self.current_x += dz
+            dz = msg.linear.x
+            x = self.current_x + dz
+            y = self.current_y
+            d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
+            if abs(d) > 1.0:
+                self.get_logger().info("Target position is out of reach.")
+                return None
             self.get_logger().info(f"New X position: {self.current_x}")
             self.compute_ik()
 
         if abs(msg.linear.y) > 1e-4:
-            dz = msg.linear.y * 3
-            self.current_y += dz
+            dz = msg.linear.y
+            x = self.current_x
+            y = self.current_y + dz
+            d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
+            if abs(d) > 1.0:
+                self.get_logger().info("Target position is out of reach.")
+                return None
             self.get_logger().info(f"New Y position: {self.current_y}")
             self.compute_ik()
 
@@ -72,10 +82,6 @@ class IKServoController(Node):
         y = self.current_y - self.l1  # Adjust for base height
         x = self.current_x
         d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
-
-        if abs(d) > 1.0:
-            self.get_logger().info("Target position is out of reach.")
-            return None
         
         q2 = math.acos(d)
         q1 = math.atan2(y, x) - math.atan2(self.l2 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
