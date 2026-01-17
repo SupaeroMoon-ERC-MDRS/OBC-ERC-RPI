@@ -87,11 +87,11 @@ class RoboclawNode(Node):
         """Handle velocity commands for multiple differential drive motors"""
         try:
             vel_fl = msg.data[0]
-            vel_fr = msg.data[2]
-            vel_rl = msg.data[4]
-            vel_rr = msg.data[6]
-            vel_ml = msg.data[8]
-            vel_mr = msg.data[10]
+            vel_fr = msg.data[1]
+            vel_rl = msg.data[2]
+            vel_rr = msg.data[3]
+            vel_ml = msg.data[4]
+            vel_mr = msg.data[5]
             rights = [vel_fr, vel_mr, vel_rr]
             lefts = [vel_fl, vel_ml, vel_rl]
             
