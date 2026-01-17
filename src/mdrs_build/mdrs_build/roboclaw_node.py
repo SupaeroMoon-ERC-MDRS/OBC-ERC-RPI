@@ -60,7 +60,7 @@ class RoboclawNode(Node):
             self.robo.ForwardM2(address, 0)
             self.robo.ResetEncoders(address)
 
-        # self.TICKS_PER_METER = 4342.2  # to be tested
+        # self.ticks_per_meter = 4342.2  # to be tested
         self.BASE_WIDTH = 0.446  # to be checked
         self.ticks_per_meter = self.ticks_per_rev / (2 * np.pi * self.wheel_radius)
         # 509554
@@ -156,8 +156,8 @@ class RoboclawNode(Node):
         left_ticks = self.get_single_encoder('left', 130)
         right_ticks = self.get_single_encoder('right', 130)
 
-        delta_left = (left_ticks - self.prev_left) / self.TICKS_PER_METER
-        delta_right = (right_ticks - self.prev_right) / self.TICKS_PER_METER
+        delta_left = (left_ticks - self.prev_left) / self.ticks_per_meter
+        delta_right = (right_ticks - self.prev_right) / self.ticks_per_meter
 
         self.prev_left = left_ticks
         self.prev_right = right_ticks
