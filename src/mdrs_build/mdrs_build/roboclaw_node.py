@@ -29,9 +29,9 @@ class RoboclawNode(Node):
 
         self.robo = Roboclaw(dev_name1, baud_rate)
         self.addresses = [int(128), int(129), int(130)]  # change
-        self.gear_ratio = 26.9
+        self.gear_ratio = 50
         self.wheel_radius = 0.19/2
-        self.ticks_per_rev = 752
+        self.ticks_per_rev = 64*self.gear_ratio
         self.conversion_factor = 1/50
         self.accel = int(16383/2)
 
