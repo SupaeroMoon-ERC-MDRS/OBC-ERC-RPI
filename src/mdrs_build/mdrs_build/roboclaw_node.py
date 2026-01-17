@@ -31,7 +31,7 @@ class RoboclawNode(Node):
         self.addresses = [int(128), int(129), int(130)]  # change
         self.gear_ratio = 50
         self.wheel_radius = 0.1/2
-        self.ticks_per_rev = 2847
+        self.ticks_per_rev = 64*self.gear_ratio  # 64 for 100kV motors with encoders
         self.conversion_factor = 1/50
         self.accel = int(16383/2)
 
