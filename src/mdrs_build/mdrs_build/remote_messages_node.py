@@ -95,7 +95,7 @@ class RemoteComms(Node):
 
         # setting max limits
         self.max_lin_speed = 9.0
-        self.max_ang_speed = 5.0
+        self.max_ang_speed = 1.0
 
         ##initialise arm control variables
         #initial motion directions

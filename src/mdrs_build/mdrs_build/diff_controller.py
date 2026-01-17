@@ -36,12 +36,7 @@ class DifferentialDriveController(Node):
         linear_velocity = msg.linear.x
         angular_velocity = msg.angular.z
 
-        if abs(angular_velocity) > 0.001:  # avoid division by zero
-            turn_radius = linear_velocity / angular_velocity
-        else:
-            turn_radius = float('inf')
-
-        self.lf, self.lm, self.lr, self.rf, self.rm, self.rr = self.calculate_wheel_speeds(linear_velocity, turn_radius)
+        self.lf, self.lm, self.lr, self.rf, self.rm, self.rr = self.calculate_wheel_speeds(linear_velocity, angular_velocity)
 
         # self.left_vel = (linear_velocity - (angular_velocity * TRACK_WIDTH / 2)) / ROVER_WHEEL_RADIUS
         # self.right_vel = (linear_velocity + (angular_velocity * TRACK_WIDTH / 2)) / ROVER_WHEEL_RADIUS
@@ -54,19 +49,24 @@ class DifferentialDriveController(Node):
         wheel_msg.data = [self.lf, self.rf, self.lr, self.rr, self.lm, self.rm]
         self.motor_wheel_pub.publish(wheel_msg)
 
-    def calculate_wheel_speeds(self, base_speed, turn_radius):
+    def calculate_wheel_speeds(self, base_speed, angular_velocity):
         L = WHEEL_BASE  # distance to front or rear from center
         W = TRACK_WIDTH
-        R = turn_radius
+
+        if abs(angular_velocity) > 0.001:  # avoid division by zero
+            R = base_speed / angular_velocity
+        else:
+            R = float('inf')
         
         # Handle special cases
-        if abs(R) < 0.001:  # Pivot turn
+        if abs(base_speed) < 0.001:  # Pivot turn
             # For pivot, just use differential speeds
             self.get_logger().info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            self.get_logger().info(f"STARTING PIVOT TURN at speed {base_speed}")
+            self.get_logger().info(f"STARTING PIVOT TURN at speed {angular_velocity}")
             self.get_logger().info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            left_vel = -base_speed
-            right_vel = base_speed
+            turn_speed = angular_velocity * ROVER_WHEEL_RADIUS
+            left_vel = -turn_speed
+            right_vel = turn_speed
             return (left_vel, left_vel, left_vel, right_vel, right_vel, right_vel)
         
         if abs(R) > 1000:  # Essentially straight
