@@ -11,6 +11,11 @@ import busio
 class IKServoController(Node):
     def __init__(self):
         super().__init__('inverse_kinematics')
+        
+        # Arm lengths
+        self.l1 = 0.13814
+        self.l2 = 0.179
+        self.l3 = 0.19272
 
         self.total_reach = 0.510+0.22524
         self.current_x = 0.0
@@ -40,10 +45,6 @@ class IKServoController(Node):
         self.theta_2 = servo.Servo(self.pca.channels[2], actuation_range=270, min_pulse=500, max_pulse=2500)
         self.gripper = servo.Servo(self.pca.channels[3], actuation_range=270, min_pulse=500, max_pulse=2500)
 
-        # Arm lengths
-        self.l1 = 0.13814
-        self.l2 = 0.179
-        self.l3 = 0.19272
 
         self.get_logger().info("IK Servo Controller node started.")
 
