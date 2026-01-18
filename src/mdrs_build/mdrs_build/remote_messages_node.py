@@ -96,7 +96,7 @@ class RemoteComms(Node):
         # setting max limits
         self.max_lin_speed = 9.0
         self.max_ang_speed = 10.0
-        self.max_angle = 5.0
+        self.max_angle = 0.5
 
         # toggle for arm mode
         self.prev_toggle = [None, None]
