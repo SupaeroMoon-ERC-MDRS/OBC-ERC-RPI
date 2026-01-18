@@ -12,8 +12,9 @@ class IKServoController(Node):
     def __init__(self):
         super().__init__('inverse_kinematics')
 
+        self.total_reach = 0.510+0.22524
         self.current_x = 0.0
-        self.current_y = 0.510+0.22524 # Total height of arm goes here
+        self.current_y = self.total_reach
         self.base_curr = 0.0
         self.theta_1_curr = 150.0
         self.theta_2_curr = 150.0
@@ -49,8 +50,8 @@ class IKServoController(Node):
             dz = msg.linear.x
             x = self.current_x + dz
             y = self.current_y
-            d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
-            if abs(d) > 1.0:
+            d = math.sqrt(x**2 + y**2)
+            if abs(d) > self.total_reach:
                 self.get_logger().info("Target position is out of reach.")
                 return None
             self.get_logger().info(f"New X position: {self.current_x}")
@@ -60,8 +61,8 @@ class IKServoController(Node):
             dz = msg.linear.y
             x = self.current_x
             y = self.current_y + dz
-            d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
-            if abs(d) > 1.0:
+            d = math.sqrt(x**2 + y**2)
+            if abs(d) > self.total_reach:
                 self.get_logger().info("Target position is out of reach.")
                 return None
             self.get_logger().info(f"New Y position: {self.current_y}")
@@ -81,10 +82,10 @@ class IKServoController(Node):
     def compute_ik(self):
         y = self.current_y - self.l1  # Adjust for base height
         x = self.current_x
-        d = (x**2 + y**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3)
+        d = math.sqrt(x**2 + y**2)
         
-        q2 = math.acos(d)
-        q1 = math.atan2(y, x) - math.atan2(self.l2 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
+        q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
+        q1 = math.atan2(y, x) - math.acos((self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d))
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
         self.theta_1_curr = q1
