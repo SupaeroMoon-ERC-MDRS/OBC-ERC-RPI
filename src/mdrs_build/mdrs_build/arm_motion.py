@@ -100,7 +100,8 @@ class IKServoController(Node):
         d = math.sqrt(x**2 + y**2)
         
         q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
-        q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
+        # q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
+        q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
         # Gemini's version of IK:
         # cos_q2 = (self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
         # cos_q2 = max(-1.0, min(1.0, cos_q2)) # Safety Clamp
