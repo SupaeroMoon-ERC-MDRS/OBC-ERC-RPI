@@ -11,7 +11,7 @@ import busio
 class IKServoController(Node):
     def __init__(self):
         super().__init__('inverse_kinematics')
-        
+
         # Arm lengths
         self.l1 = 0.13814
         self.l2 = 0.179
@@ -94,7 +94,7 @@ class IKServoController(Node):
         d = math.sqrt(x**2 + y**2)
         
         q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
-        q1 = math.atan2(y, x) - math.acos((self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d))
+        q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
         self.theta_1_curr = q1
