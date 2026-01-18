@@ -81,6 +81,8 @@ class IKServoController(Node):
             dz = msg.angular.z * 3
             self.gripper_curr += dz
             self.send_to_servo(self.gripper_curr, self.gripper)
+        else:
+            self.get_logger().info("No arm movement command received.")
 
 
     def compute_ik(self):
