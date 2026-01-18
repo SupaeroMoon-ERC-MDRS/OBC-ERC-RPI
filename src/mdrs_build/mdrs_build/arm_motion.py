@@ -60,8 +60,10 @@ class IKServoController(Node):
                 self.get_logger().info("Max reach is " + str(self.total_reach))
                 self.get_logger().info("Target position is out of reach.")
                 return None
-            self.get_logger().info(f"New X position: {self.current_x}")
-            self.compute_ik()
+            else:
+                self.current_x = x
+                self.get_logger().info(f"New X position: {self.current_x}")
+                self.compute_ik()
 
         if abs(msg.linear.y) > 1e-4:
             dz = msg.linear.y
@@ -73,8 +75,10 @@ class IKServoController(Node):
                 self.get_logger().info("Max reach is " + str(self.total_reach))
                 self.get_logger().info("Target position is out of reach.")
                 return None
-            self.get_logger().info(f"New Y position: {self.current_y}")
-            self.compute_ik()
+            else:
+                self.current_y =y
+                self.get_logger().info(f"New Y position: {self.current_y}")
+                self.compute_ik()
 
         if abs(msg.angular.x) > 1e-4:
             dtheta = msg.angular.x * 10
@@ -95,8 +99,15 @@ class IKServoController(Node):
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
         
-        q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
-        q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
+        # q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
+        # q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
+        cos_q2 = (self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
+        cos_q2 = max(-1.0, min(1.0, cos_q2)) # Safety Clamp
+        q2 = math.acos(cos_q2)
+
+        cos_q1 = (self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
+        cos_q1 = max(-1.0, min(1.0, cos_q1)) # Safety Clamp
+        q1 = math.atan2(y, x) - math.acos(cos_q1)
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
         self.theta_1_curr = q1
@@ -107,9 +118,9 @@ class IKServoController(Node):
         return q1, q2
 
     def send_to_servo(self, q1, servo1):
-        a1 = q1 * 180/ 300
+        # a1 = q1 * 180/ 300
         # Clamp to [0, 180] as needed for hobby servos
-        a1 = max(0, min(180, a1))  # Offset for center position
+        a1 = max(0, min(270, q1))  # Offset for center position
 
         self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
         servo1.angle = a1
