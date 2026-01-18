@@ -12,6 +12,18 @@ class IKServoController(Node):
     def __init__(self):
         super().__init__('inverse_kinematics')
 
+        self.get_logger().info("Initializing I2C for PCA9685 and Servos")
+        i2c = busio.I2C(board.SCL, board.SDA)
+        self.pca = PCA9685(i2c, address=0x43)
+        self.pca.frequency = 50
+
+        # Create servo objects
+        self.base = servo.Servo(self.pca.channels[0], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.theta_1 = servo.Servo(self.pca.channels[1], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.theta_2 = servo.Servo(self.pca.channels[2], actuation_range=270, min_pulse=500, max_pulse=2500)
+        self.gripper = servo.Servo(self.pca.channels[3], actuation_range=270, min_pulse=500, max_pulse=2500)
+        
+        self.get_logger().info("Homing Arm")
         # Arm lengths
         self.l1 = 0.13814
         self.l2 = 0.179
@@ -21,6 +33,7 @@ class IKServoController(Node):
         self.current_x = 0.0
         self.current_y = self.total_reach - 0.2
         theta_1, theta_2 = self.compute_ik()
+
 
         self.base_curr = 0.0
         self.theta_1_curr = theta_1
@@ -33,18 +46,6 @@ class IKServoController(Node):
             self.cmd_callback,
             10
         )
-
-        
-        i2c = busio.I2C(board.SCL, board.SDA)
-        self.pca = PCA9685(i2c, address=0x43)
-        self.pca.frequency = 50
-
-        # Create servo objects
-        self.base = servo.Servo(self.pca.channels[0], actuation_range=270, min_pulse=500, max_pulse=2500)
-        self.theta_1 = servo.Servo(self.pca.channels[1], actuation_range=270, min_pulse=500, max_pulse=2500)
-        self.theta_2 = servo.Servo(self.pca.channels[2], actuation_range=270, min_pulse=500, max_pulse=2500)
-        self.gripper = servo.Servo(self.pca.channels[3], actuation_range=270, min_pulse=500, max_pulse=2500)
-
 
         self.get_logger().info("IK Servo Controller node started.")
 
@@ -89,6 +90,7 @@ class IKServoController(Node):
 
 
     def compute_ik(self):
+        self.get_logger().info(f"Computing IK for current_x: {self.current_x}, current_y: {self.current_y}")
         y = self.current_y - self.l1  # Adjust for base height
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
