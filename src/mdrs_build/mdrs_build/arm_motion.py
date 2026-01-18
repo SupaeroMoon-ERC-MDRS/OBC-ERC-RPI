@@ -99,15 +99,16 @@ class IKServoController(Node):
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
         
-        # q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
-        # q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
-        cos_q2 = (self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
-        cos_q2 = max(-1.0, min(1.0, cos_q2)) # Safety Clamp
-        q2 = math.acos(cos_q2)
+        q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
+        q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
+        # Gemini's version of IK:
+        # cos_q2 = (self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
+        # cos_q2 = max(-1.0, min(1.0, cos_q2)) # Safety Clamp
+        # q2 = math.acos(cos_q2)
 
-        cos_q1 = (self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
-        cos_q1 = max(-1.0, min(1.0, cos_q1)) # Safety Clamp
-        q1 = math.atan2(y, x) - math.acos(cos_q1)
+        # cos_q1 = (self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
+        # cos_q1 = max(-1.0, min(1.0, cos_q1)) # Safety Clamp
+        # q1 = math.atan2(y, x) - math.acos(cos_q1)
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
         self.theta_1_curr = q1
