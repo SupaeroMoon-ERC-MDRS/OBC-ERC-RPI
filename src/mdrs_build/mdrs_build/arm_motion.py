@@ -14,10 +14,12 @@ class IKServoController(Node):
 
         self.total_reach = 0.510+0.22524
         self.current_x = 0.0
-        self.current_y = self.total_reach
+        self.current_y = self.total_reach - 0.2
+        theta_1, theta_2 = self.compute_ik()
+
         self.base_curr = 0.0
-        self.theta_1_curr = 150.0
-        self.theta_2_curr = 150.0
+        self.theta_1_curr = theta_1
+        self.theta_2_curr = theta_2
         self.gripper_curr = 90.0
 
         self.subscription = self.create_subscription(
