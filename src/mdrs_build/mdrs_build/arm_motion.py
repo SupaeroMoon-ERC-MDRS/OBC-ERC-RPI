@@ -52,6 +52,8 @@ class IKServoController(Node):
             y = self.current_y
             d = math.sqrt(x**2 + y**2)
             if abs(d) > self.total_reach:
+                self.get_logger().info(f"Current x is {x}, current y is {y}, total reach is {d}")
+                self.get_logger().info("Max reach is " + str(self.total_reach))
                 self.get_logger().info("Target position is out of reach.")
                 return None
             self.get_logger().info(f"New X position: {self.current_x}")
@@ -63,6 +65,8 @@ class IKServoController(Node):
             y = self.current_y + dz
             d = math.sqrt(x**2 + y**2)
             if abs(d) > self.total_reach:
+                self.get_logger().info(f"Current x is {x}, current y is {y}, total reach is {d}")
+                self.get_logger().info("Max reach is " + str(self.total_reach))
                 self.get_logger().info("Target position is out of reach.")
                 return None
             self.get_logger().info(f"New Y position: {self.current_y}")
