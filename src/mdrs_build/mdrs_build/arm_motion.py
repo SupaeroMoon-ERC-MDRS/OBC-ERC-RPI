@@ -29,10 +29,10 @@ class IKServoController(Node):
         self.l2 = 0.179
         self.l3 = 0.19272
 
-        self.total_reach = 0.510+0.22524
+        self.total_reach = self.l1 + self.l2 + self.l3
         self.current_x = 0.0
         self.current_y = self.total_reach - 0.2
-        theta_1, theta_2 = self.compute_ik_up()
+        theta_1, theta_2 = self.compute_ik(dir='up')
 
 
         self.base_curr = 0.0
@@ -66,9 +66,9 @@ class IKServoController(Node):
                 self.current_x = x
                 self.get_logger().info(f"New X position: {self.current_x}")
                 if self.current_x >= 0:
-                    self.compute_ik_up()
+                    self.compute_ik(dir='up')
                 else:
-                    self.compute_ik_down()
+                    self.compute_ik_down(dir='down')
 
         # Case 2: arm up/down
         if abs(msg.linear.y) > 1e-4:
@@ -85,9 +85,9 @@ class IKServoController(Node):
                 self.current_y =y
                 self.get_logger().info(f"New Y position: {self.current_y}")
                 if self.current_x >= 0:
-                    self.compute_ik_up()
+                    self.compute_ik(dir='up')
                 else:
-                    self.compute_ik_down()
+                    self.compute_ik_down(dir='down')
 
         # Case 3: arm base rotation
         if abs(msg.angular.x) > 1e-4:
@@ -104,7 +104,7 @@ class IKServoController(Node):
             self.get_logger().info("No arm movement command received.")
 
 
-    def compute_ik_up(self):
+    def compute_ik(self, dir='up'):
         self.get_logger().info(f"Computing IK for current_x: {self.current_x}, current_y: {self.current_y}")
         y = self.current_y - self.l1  # Adjust for base height
         x = self.current_x
@@ -113,34 +113,10 @@ class IKServoController(Node):
         self.get_logger().info(f"Nominator: {(d**2 - self.l2**2 - self.l3**2 )}, denom: { (2 * self.l2 * self.l3)}")
         self.get_logger().info(f"Full: {(d**2 - self.l2**2 - self.l3**2 ) / (2 * self.l2 * self.l3)}")
         q2 = math.acos((d**2 - self.l2**2 - self.l3**2 ) / (2 * self.l2 * self.l3))
-        # q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
         q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
-        # Gemini's version of IK:
-        # cos_q2 = (self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
-        # cos_q2 = max(-1.0, min(1.0, cos_q2)) # Safety Clamp
-        # q2 = math.acos(cos_q2)
-
-        # cos_q1 = (self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
-        # cos_q1 = max(-1.0, min(1.0, cos_q1)) # Safety Clamp
-        # q1 = math.atan2(y, x) - math.acos(cos_q1)
-        q1 = math.degrees(q1)
-        q2 = math.degrees(q2)
-        self.theta_1_curr = 270-q1
-        self.theta_2_curr = q2
-        self.send_to_servo(self.theta_1_curr, self.theta_1)
-        self.send_to_servo(self.theta_2_curr, self.theta_2)
-
-        return q1, q2
-
-    def compute_ik_down(self):
-        self.get_logger().info(f"Computing IK for current_x: {self.current_x}, current_y: {self.current_y}")
-        y = self.current_y - self.l1  # Adjust for base height
-        x = self.current_x
-        d = math.sqrt(x**2 + y**2)
+        if dir == 'up':
+            q2 = -q2
         
-        q2 = math.acos(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)
-        # q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
-        q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
         self.theta_1_curr = 270-q1
@@ -149,7 +125,6 @@ class IKServoController(Node):
         self.send_to_servo(self.theta_2_curr, self.theta_2)
 
         return q1, q2
-    
 
     def send_to_servo(self, q1, servo1):
 
