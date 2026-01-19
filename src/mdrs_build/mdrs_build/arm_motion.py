@@ -162,9 +162,9 @@ class IKServoController(Node):
 
     def go_home(self):
         self.get_logger().info("Returning to home position.")
-        self.send_to_servo(0.0, self.base)
-        self.send_to_servo(150.0, self.theta_1)
-        self.send_to_servo(150.0, self.theta_2)
+        self.send_to_servo(135.0, self.base)
+        self.send_to_servo(135.0, self.theta_1)
+        self.send_to_servo(135.0, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
 
 
