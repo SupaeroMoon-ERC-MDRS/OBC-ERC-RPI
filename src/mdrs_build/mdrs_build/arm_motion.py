@@ -109,7 +109,7 @@ class IKServoController(Node):
         y = self.current_y - self.l1  # Adjust for base height
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
-        q2 = math.pi - math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
+        q2 = math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
         if dir == 'up':
             q2 = -q2
         
@@ -118,9 +118,12 @@ class IKServoController(Node):
         q2 = math.degrees(q2)
         self.theta_1_curr = 270-q1
         self.theta_2_curr = q2
-        self.get_logger().info(f"Computed angles: theta_1={self.theta_1_curr:.1f}, theta_2={self.theta_2_curr:.1f}")
-        self.send_to_servo(self.theta_1_curr, self.theta_1)
-        self.send_to_servo(self.theta_2_curr, self.theta_2)
+        theta_1_servo = self.OFFSET_THE_1 + (90 - q1) # Example mapping, adjust sign as needed
+        theta_2_servo = self.OFFSET_THE_2 + q2
+
+        self.get_logger().info(f"Computed angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
+        self.send_to_servo(theta_1_servo, self.theta_1)
+        self.send_to_servo(theta_2_servo, self.theta_2)
 
         return q1, q2
 
