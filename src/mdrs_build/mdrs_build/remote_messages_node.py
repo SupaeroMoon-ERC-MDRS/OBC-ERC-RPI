@@ -314,7 +314,7 @@ class RemoteComms(Node):
             self.end_grip = 1.0
 
         #print to debug
-        self.get_logger().info(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
+        # self.get_logger().info(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
 
         arm_cmd.linear.x = self.lin_x
         arm_cmd.linear.y = self.lin_y

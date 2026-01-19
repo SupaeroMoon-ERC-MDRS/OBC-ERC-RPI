@@ -52,8 +52,8 @@ class IKServoController(Node):
     def cmd_callback(self, msg):
 
         # Case 1: arm fwd/bkwd
-        if abs(msg.linear.x) > 1e-4:
-            dz = msg.linear.x * 5.0
+        if abs(msg.linear.x) > 1e-4 and abs(msg.linear.y) < 1e-4:
+            dz = msg.linear.x
             x = self.current_x + dz
             y = self.current_y
             d = math.sqrt(x**2 + y**2)
@@ -71,8 +71,8 @@ class IKServoController(Node):
                     self.compute_ik(dir='down')
 
         # Case 2: arm up/down
-        if abs(msg.linear.y) > 1e-4:
-            dz = msg.linear.y * 5.0
+        if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) < 1e-4:
+            dz = msg.linear.y
             x = self.current_x
             y = self.current_y + dz
             d = math.sqrt(x**2 + y**2)
@@ -83,6 +83,27 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_y =y
+                self.get_logger().info(f"New Y position: {self.current_y}")
+                if self.current_x >= 0:
+                    self.compute_ik(dir='up')
+                else:
+                    self.compute_ik(dir='down')
+
+        # Case 2: arm up/down
+        if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) > 1e-4:
+            dx = msg.linear.x
+            dy = msg.linear.y
+            x = self.current_x + dx
+            y = self.current_y + dy
+            d = math.sqrt(x**2 + y**2)
+            if abs(d) > self.total_reach:
+                self.get_logger().info(f"Current x is {x}, current y is {y}, total reach is {d}")
+                self.get_logger().info("Max reach is " + str(self.total_reach))
+                self.get_logger().info("Target position is out of reach.")
+                return None
+            else:
+                self.current_x = x
+                self.current_y = y
                 self.get_logger().info(f"New Y position: {self.current_y}")
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
