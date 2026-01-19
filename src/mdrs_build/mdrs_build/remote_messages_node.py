@@ -96,7 +96,7 @@ class RemoteComms(Node):
         # setting max limits
         self.max_lin_speed = 9.0
         self.max_ang_speed = 10.0
-        self.max_angle = 1.0
+        self.max_servo_lin = 0.02
 
         # toggle for arm mode
         self.prev_toggle = [None, None]
@@ -301,9 +301,9 @@ class RemoteComms(Node):
         self.end_grip = 0.0 #wrist rotation
 
         if self.ThumbLX:
-            self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_angle
+            self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_servo_lin
         if self.ThumbLY:
-            self.lin_y = self.thumb_curve(self.ThumbLY) * self.max_angle
+            self.lin_y = -self.thumb_curve(self.ThumbLY) * self.max_servo_lin
         if self.LL: # arm base left
             self.base = 1.0
         elif self.LR: # arm base right
