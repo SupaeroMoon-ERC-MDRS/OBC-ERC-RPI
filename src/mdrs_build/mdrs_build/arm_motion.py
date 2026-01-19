@@ -30,7 +30,7 @@ class IKServoController(Node):
         self.l3 = 0.19272
 
         self.total_reach = self.l1 + self.l2 + self.l3
-        self.current_x = 0.05
+        self.current_x = 0.0
         self.current_y = self.total_reach - 0.05
         theta_1, theta_2 = self.compute_ik(dir='up')
 
@@ -87,7 +87,7 @@ class IKServoController(Node):
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
                 else:
-                    self.compute_ik_down(dir='down')
+                    self.compute_ik(dir='down')
 
         # Case 3: arm base rotation
         if abs(msg.angular.x) > 1e-4:
@@ -109,14 +109,11 @@ class IKServoController(Node):
         y = self.current_y - self.l1  # Adjust for base height
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
-
-        self.get_logger().info(f"Nominator: {(d**2 - self.l2**2 - self.l3**2 )}, denom: { (2 * self.l2 * self.l3)}")
-        self.get_logger().info(f"Full: {(d**2 - self.l2**2 - self.l3**2 ) / (2 * self.l2 * self.l3)}")
-        q2 = math.acos((d**2 - self.l2**2 - self.l3**2 ) / (2 * self.l2 * self.l3))
-        q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
+        q2 = math.pi - math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
         if dir == 'up':
             q2 = -q2
         
+        q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
         q1 = math.degrees(q1)
         q2 = math.degrees(q2)
         self.theta_1_curr = 270-q1
@@ -138,8 +135,7 @@ class IKServoController(Node):
         self.send_to_servo(135.0, self.theta_1)
         self.send_to_servo(135.0, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
-
-
+    
 def main(args=None):
     rclpy.init(args=args)
     inv_kin = IKServoController()
