@@ -118,8 +118,8 @@ class IKServoController(Node):
         q2 = math.degrees(q2)
         self.theta_1_curr = 270-q1
         self.theta_2_curr = q2
-        theta_1_servo = self.OFFSET_THE_1 + (90 - q1) # Example mapping, adjust sign as needed
-        theta_2_servo = self.OFFSET_THE_2 + q2
+        theta_1_servo = 135 + (90 - q1) # Example mapping, adjust sign as needed
+        theta_2_servo = 135 + q2
 
         self.get_logger().info(f"Computed angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
         self.send_to_servo(theta_1_servo, self.theta_1)
