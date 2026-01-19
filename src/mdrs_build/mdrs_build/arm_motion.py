@@ -82,7 +82,7 @@ class IKServoController(Node):
                 self.get_logger().info("Target position is out of reach.")
                 return None
             else:
-                self.current_y =y
+                self.current_y = y
                 self.get_logger().info(f"Moving in Y")
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')

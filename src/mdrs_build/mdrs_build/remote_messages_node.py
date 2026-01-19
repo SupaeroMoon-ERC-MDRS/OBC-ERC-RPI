@@ -113,6 +113,7 @@ class RemoteComms(Node):
         self.ThumbRX = 127.0
         self.ThumbRY = 127.0
         self.ThumbDeadZone = 10.0
+        self.ThumbDeadZone_arm = 20.0
         self.ThumbCenter = 127.0
 
         # Timer to run remote input method repeatedly once the Node is initialised
@@ -251,11 +252,19 @@ class RemoteComms(Node):
                 
 
     def thumb_curve(self, x):
-        if x > self.ThumbCenter + self.ThumbDeadZone:
-            return (1.3 ** ((x - self.ThumbCenter - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
-        elif x < self.ThumbCenter - self.ThumbDeadZone:
-            return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
+        if self.arm_mode:
+            if x > self.ThumbCenter + self.ThumbDeadZone_arm:
+                return (1.3 ** ((x - self.ThumbDeadZone_arm - self.ThumbDeadZone_arm) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone_arm) / 10) - 1)
+            elif x < self.ThumbCenter - self.ThumbDeadZone_arm:
+                return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone_arm) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone_arm) / 10) - 1)
+            else:
+                return 0.0
         else:
+            if x > self.ThumbCenter + self.ThumbDeadZone:
+                return (1.3 ** ((x - self.ThumbCenter - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
+            elif x < self.ThumbCenter - self.ThumbDeadZone:
+                return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
+            else:
             return 0.0
 
     def rover_command(self):
@@ -303,7 +312,7 @@ class RemoteComms(Node):
         if self.ThumbLX:
             self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_servo_lin
         if self.ThumbLY:
-            self.lin_y = -self.thumb_curve(self.ThumbLY) * self.max_servo_lin
+            self.lin_y = self.thumb_curve(self.ThumbLY) * self.max_servo_lin
         if self.LL: # arm base left
             self.base = 1.0
         elif self.LR: # arm base right
