@@ -110,9 +110,9 @@ class IKServoController(Node):
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
 
-        self.get_logger().info(f"Nominator: {(self.l2**2 + self.l3**2 - d**2)}, denom: { (2 * self.l2 * self.l3)}")
-        self.get_logger().info(f"Full: {(self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3)}")
-        q2 = math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
+        self.get_logger().info(f"Nominator: {(d**2 - self.l2**2 - self.l3**2 )}, denom: { (2 * self.l2 * self.l3)}")
+        self.get_logger().info(f"Full: {(d**2 - self.l2**2 - self.l3**2 ) / (2 * self.l2 * self.l3)}")
+        q2 = math.acos((d**2 - self.l2**2 - self.l3**2 ) / (2 * self.l2 * self.l3))
         # q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
         q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
         # Gemini's version of IK:
