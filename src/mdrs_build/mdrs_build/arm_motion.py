@@ -109,6 +109,8 @@ class IKServoController(Node):
         y = self.current_y - self.l1  # Adjust for base height
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
+
+        self.get_logger().info(f"Nominator: {(self.l2**2 + self.l3**2 - d**2)}, denom: { (2 * self.l2 * self.l3)}")
         
         q2 = math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
         # q1 = math.atan2(y, x) - math.acos(self.l2**2 + d**2 - self.l3**2) / (2 * self.l2 * d)
