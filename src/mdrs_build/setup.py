@@ -18,6 +18,8 @@ setup(
         (os.path.join('lib', package_name), glob('mdrs_build/raspistatechecker.py')),
         (os.path.join('lib', package_name), glob('mdrs_build/udpcanpy*')),
         (os.path.join('lib', package_name), glob('mdrs_build/comms.dbc')),
+        (os.path.join('share', package_name, 'config'), glob('config/*')),
+
 
     ],
     install_requires=['setuptools'],
@@ -37,6 +39,9 @@ setup(
             'servo_control = mdrs_build.servo_control:main',
             'keyboard_control = mdrs_build.keyboard_control:main',
             'arm_motion = mdrs_build.arm_motion:main',
+            'aruco_pub = mdrs_build.aruco_pub:main',
+            'marker_follower = mdrs_build.marker_follower:main',
+            'stereo_camera = mdrs_build.stereo_camera:main',
         ],
     },
 )

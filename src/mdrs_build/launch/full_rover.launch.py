@@ -3,7 +3,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     return LaunchDescription([
-        # Ackermann controller
+        # steering controller
         Node(
             package='mdrs_build',
             executable='diff_controller',
@@ -19,14 +19,15 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # Remote messages (e.g., joystick or high-level commands)
-        # Node(
-        #     package='mdrs_build',
-        #     executable='keyboard_control',
-        #     name='keyboard_control',
-        #     output='screen'
-        # ),
 
+        # This function drives the arm
+        Node(
+            package='mdrs_build',
+            executable='arm_motion',
+            name='arm_motion',
+            output='screen'
+        ),
+        # Communication between remote control and rover
         Node(
             package='mdrs_build',
             executable='remote_messages_node',
@@ -34,4 +35,11 @@ def generate_launch_description():
             output='screen'
         )
 
+        # Backup in case remote not available
+        # Node(
+        #     package='mdrs_build',
+        #     executable='keyboard_control',
+        #     name='keyboard_control',
+        #     output='screen'
+        # ),
     ])
