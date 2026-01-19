@@ -30,8 +30,8 @@ class IKServoController(Node):
         self.l3 = 0.19272
 
         self.total_reach = self.l1 + self.l2 + self.l3
-        self.current_x = 0.0
-        self.current_y = self.total_reach - 0.2
+        self.current_x = 0.05
+        self.current_y = self.total_reach - 0.05
         theta_1, theta_2 = self.compute_ik(dir='up')
 
 
@@ -68,7 +68,7 @@ class IKServoController(Node):
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
                 else:
-                    self.compute_ik_down(dir='down')
+                    self.compute_ik(dir='down')
 
         # Case 2: arm up/down
         if abs(msg.linear.y) > 1e-4:
@@ -129,7 +129,7 @@ class IKServoController(Node):
     def send_to_servo(self, q1, servo1):
 
         a1 = max(0, min(270, q1))
-        self.get_logger().info(f"Setting angles: servo0={a1:.1f}")
+        self.get_logger().info(f"Setting angles: servo={a1:.1f}")
         servo1.angle = a1
 
     def go_home(self):
