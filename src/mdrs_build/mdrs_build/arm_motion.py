@@ -29,7 +29,7 @@ class IKServoController(Node):
         self.l2 = 0.179
         self.l3 = 0.19272
 
-        self.total_reach = self.l1 + self.l2 + self.l3
+        self.total_reach = self.l1 + self.l2 + self.l3 # 0.51012
         self.current_x = 0.0
         self.current_y = self.total_reach - 0.05
         theta_1, theta_2 = self.compute_ik(dir='up')
@@ -64,7 +64,7 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_x = x
-                self.get_logger().info(f"New X position: {self.current_x}")
+                self.get_logger().info(f"Moving in X")
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
                 else:
@@ -83,7 +83,7 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_y =y
-                self.get_logger().info(f"New Y position: {self.current_y}")
+                self.get_logger().info(f"Moving in Y")
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
                 else:
@@ -104,7 +104,7 @@ class IKServoController(Node):
             else:
                 self.current_x = x
                 self.current_y = y
-                self.get_logger().info(f"New Y position: {self.current_y}")
+                self.get_logger().info(f"Moving in BOTH X Y")
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
                 else:
