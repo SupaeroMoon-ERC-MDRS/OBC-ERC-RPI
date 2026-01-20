@@ -29,7 +29,7 @@ class IKServoController(Node):
         self.l2 = 0.18052
         self.l3 = 0.16994
 
-        self.total_reach = self.l1 + self.l2 + self.l3 # 0.51012
+        self.total_reach = self.l2 + self.l3 # 0.51012
         self.current_x = 0.0
         self.current_y = self.total_reach - 0.05
         theta_1, theta_2 = self.compute_ik(dir='up')
@@ -127,24 +127,31 @@ class IKServoController(Node):
 
     def compute_ik(self, dir='up'):
         self.get_logger().info(f"Computing IK for current_x: {self.current_x}, current_y: {self.current_y}")
-        y = self.current_y - self.l1  # Adjust for base height
+        y = self.current_y  # Adjust for base height
         x = self.current_x
         d = math.sqrt(x**2 + y**2)
-        q2 = math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
-        if dir == 'up':
-            q2 = -q2
-        
-        q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
-        q1 = math.degrees(q1)
-        q2 = math.degrees(q2)
-        self.theta_1_curr = 270-q1
-        self.theta_2_curr = q2
-        theta_1_servo = 135 + (90 - q1) # Example mapping, adjust sign as needed
-        theta_2_servo = 135 + q2
+        try: 
+            q2 = math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
+            if dir == 'up':
+                q2 = -q2
+            
+            q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
+            q1 = math.degrees(q1)
+            q2 = math.degrees(q2)
+            self.theta_1_curr = 270-q1
+            self.theta_2_curr = q2
+            theta_1_servo = 135 + (90 - q1) # Example mapping, adjust sign as needed
+            theta_2_servo = 135 + q2
 
-        self.get_logger().info(f"Computed angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
-        self.send_to_servo(theta_1_servo, self.theta_1)
-        self.send_to_servo(theta_2_servo, self.theta_2)
+            self.get_logger().info(f"Computed angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
+            self.send_to_servo(theta_1_servo, self.theta_1)
+            self.send_to_servo(theta_2_servo, self.theta_2)
+
+        except ValueError as e:
+            self.get_logger().error(f"Error computing IK: {e}")
+            self.get_logger().info(f"Input values: x={x}, y={y}, d={d}")
+            self.get_logger().info(f"differential: {self.l2**2 + self.l3**2 - d**2}")
+            q1, q2 = None, None
 
         return q1, q2
 
