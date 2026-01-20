@@ -316,7 +316,7 @@ class RemoteComms(Node):
         if self.ThumbLX:
             self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_servo_lin
         if self.ThumbLY:
-            self.lin_y = self.thumb_curve(self.ThumbLY) * self.max_servo_lin
+            self.lin_y = -self.thumb_curve(self.ThumbLY) * self.max_servo_lin
         if self.LL: # arm base left
             self.base = 1.0
         elif self.LR: # arm base right
