@@ -97,7 +97,7 @@ class RemoteComms(Node):
         # setting max limits
         self.max_lin_speed = 9.0
         self.max_ang_speed = 10.0
-        self.max_servo_lin = 0.005
+        self.max_servo_lin = 0.001
 
         # toggle for arm mode
         self.prev_toggle = [None, None]
@@ -327,7 +327,8 @@ class RemoteComms(Node):
             self.end_grip = 1.0
 
         #print to debug
-        self.get_logger().info(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
+        if self.lin_x != 0.0 or self.lin_y != 0.0 or self.base != 0.0 or self.end_grip != 0.0:
+            self.get_logger().info(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
 
         arm_cmd.linear.x = self.lin_x
         arm_cmd.linear.y = self.lin_y
