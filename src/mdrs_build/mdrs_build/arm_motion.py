@@ -136,14 +136,14 @@ class IKServoController(Node):
                 q2 = -q2
             
             q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
-            q1 = math.degrees(q1)
-            q2 = math.degrees(q2)
+            q1_deg = math.degrees(q1)
+            q2_deg = math.degrees(q2)
 
-            self.theta_1_curr = q1 # updates current
-            self.theta_2_curr = q2
+            self.theta_1_curr = q1_deg # updates current
+            self.theta_2_curr = q2_deg
 
-            theta_1_servo = 135 - (90 + q1) # Example mapping, adjust sign as needed
-            theta_2_servo = 135 + q2
+            theta_1_servo = 135 - 90 + q1_deg # Example mapping, adjust sign as needed
+            theta_2_servo = 270 - (135 + q2_deg)
 
             self.get_logger().info(f"Computed angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
             self.send_to_servo(theta_1_servo, self.theta_1)
