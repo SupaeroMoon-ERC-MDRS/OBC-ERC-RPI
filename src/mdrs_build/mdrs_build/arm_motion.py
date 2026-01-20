@@ -142,8 +142,8 @@ class IKServoController(Node):
             self.theta_1_curr = q1_deg # updates current
             self.theta_2_curr = q2_deg
 
-            theta_1_servo = 135 - 90 + q1_deg # Example mapping, adjust sign as needed
-            theta_2_servo = 270 - (135 + q2_deg)
+            theta_1_servo = 270 - (135 - 90 + q1_deg)
+            theta_2_servo = 135 + q2_deg
 
             self.get_logger().info(f"Computed angles: theta_1={q1_deg:.1f}, theta_2={q2_deg:.1f}")
             self.get_logger().info(f"Setting angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
