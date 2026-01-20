@@ -64,11 +64,11 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_x = x
-                self.get_logger().info(f"Moving in X")
-                if self.current_x >= 0:
-                    self.compute_ik(dir='up')
-                else:
-                    self.compute_ik(dir='down')
+                self.get_logger().info(f"Moving in X {x}")
+                # if self.current_x >= 0:
+                #     self.compute_ik(dir='up')
+                # else:
+                #     self.compute_ik(dir='down')
 
         # Case 2: arm up/down
         if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) < 1e-4:
@@ -83,13 +83,13 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_y = y
-                self.get_logger().info(f"Moving in Y")
-                if self.current_x >= 0:
-                    self.compute_ik(dir='up')
-                else:
-                    self.compute_ik(dir='down')
+                self.get_logger().info(f"Moving in Y {y}")
+                # if self.current_x >= 0:
+                #     self.compute_ik(dir='up')
+                # else:
+                #     self.compute_ik(dir='down')
 
-        # Case 2: arm up/down
+        # Case 3: BOTH
         if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) > 1e-4:
             dx = msg.linear.x
             dy = msg.linear.y
@@ -104,11 +104,11 @@ class IKServoController(Node):
             else:
                 self.current_x = x
                 self.current_y = y
-                self.get_logger().info(f"Moving in BOTH X Y")
-                if self.current_x >= 0:
-                    self.compute_ik(dir='up')
-                else:
-                    self.compute_ik(dir='down')
+                self.get_logger().info(f"Moving in BOTH X Y {x, y}")
+                # if self.current_x >= 0:
+                #     self.compute_ik(dir='up')
+                # else:
+                #     self.compute_ik(dir='down')
 
         # Case 3: arm base rotation
         if abs(msg.angular.x) > 1e-4:
