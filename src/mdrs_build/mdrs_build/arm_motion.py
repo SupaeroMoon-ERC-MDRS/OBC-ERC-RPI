@@ -64,7 +64,7 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_x = x
-                self.get_logger().info(f"Moving in X {x}")
+                self.get_logger().info(f"Moving in X {dz}")
                 # if self.current_x >= 0:
                 #     self.compute_ik(dir='up')
                 # else:
@@ -83,7 +83,7 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_y = y
-                self.get_logger().info(f"Moving in Y {y}")
+                self.get_logger().info(f"Moving in Y {dz}")
                 # if self.current_x >= 0:
                 #     self.compute_ik(dir='up')
                 # else:
@@ -104,7 +104,7 @@ class IKServoController(Node):
             else:
                 self.current_x = x
                 self.current_y = y
-                self.get_logger().info(f"Moving in BOTH X Y {x, y}")
+                self.get_logger().info(f"Moving in BOTH X Y {dx, dy}")
                 # if self.current_x >= 0:
                 #     self.compute_ik(dir='up')
                 # else:
@@ -145,7 +145,9 @@ class IKServoController(Node):
             theta_1_servo = 135 - 90 + q1_deg # Example mapping, adjust sign as needed
             theta_2_servo = 270 - (135 + q2_deg)
 
-            self.get_logger().info(f"Computed angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
+            self.get_logger().info(f"Computed angles: theta_1={q1_deg:.1f}, theta_2={q2_deg:.1f}")
+            self.get_logger().info(f"Setting angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
+
             self.send_to_servo(theta_1_servo, self.theta_1)
             self.send_to_servo(theta_2_servo, self.theta_2)
 
