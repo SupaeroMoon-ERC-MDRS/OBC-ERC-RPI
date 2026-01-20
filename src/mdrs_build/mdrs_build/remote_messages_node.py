@@ -194,11 +194,11 @@ class RemoteComms(Node):
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode:
-                    if [self.LT,self.LB,self.LL,self.LR] != self.prev_cmd_arm or lThumbChange: # Maybe remove this later so that we can have continuous arm movement
+                    # if [self.LT,self.LB,self.LL,self.LR] != self.prev_cmd_arm or lThumbChange: # Maybe remove this later so that we can have continuous arm movement
                         # self.get_logger().info(f"Received ARM command")
                         # self.print_remote_data()
-                        self.arm_command()
-                        self.prev_cmd_arm = [self.LT,self.LB,self.LL,self.LR]
+                    self.arm_command()
+                    self.prev_cmd_arm = [self.LT,self.LB,self.LL,self.LR]
 
         self.res = self.servo_calib_handle.access(self.servo_calib)
         if self.res >= 1024:
