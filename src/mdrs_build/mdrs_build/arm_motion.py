@@ -65,10 +65,10 @@ class IKServoController(Node):
             else:
                 self.current_x = x
                 self.get_logger().info(f"Moving in X {dz}")
-                # if self.current_x >= 0:
-                #     self.compute_ik(dir='up')
-                # else:
-                #     self.compute_ik(dir='down')
+                if self.current_x >= 0:
+                    self.compute_ik(dir='up')
+                else:
+                    self.compute_ik(dir='down')
 
         # Case 2: arm up/down
         if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) < 1e-4:
@@ -84,10 +84,10 @@ class IKServoController(Node):
             else:
                 self.current_y = y
                 self.get_logger().info(f"Moving in Y {dz}")
-                # if self.current_x >= 0:
-                #     self.compute_ik(dir='up')
-                # else:
-                #     self.compute_ik(dir='down')
+                if self.current_x >= 0:
+                    self.compute_ik(dir='up')
+                else:
+                    self.compute_ik(dir='down')
 
         # Case 3: BOTH
         if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) > 1e-4:
