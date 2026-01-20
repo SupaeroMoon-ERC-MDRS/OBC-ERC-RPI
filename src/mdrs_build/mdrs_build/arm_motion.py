@@ -25,9 +25,9 @@ class IKServoController(Node):
         
         self.get_logger().info("Homing Arm")
         # Arm lengths
-        self.l1 = 0.13814
-        self.l2 = 0.179
-        self.l3 = 0.19272
+        self.l1 = 0.11059
+        self.l2 = 0.18052
+        self.l3 = 0.16994
 
         self.total_reach = self.l1 + self.l2 + self.l3 # 0.51012
         self.current_x = 0.0
