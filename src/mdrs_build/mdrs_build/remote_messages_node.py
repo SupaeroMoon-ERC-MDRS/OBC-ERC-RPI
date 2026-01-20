@@ -269,7 +269,7 @@ class RemoteComms(Node):
             elif x < self.ThumbCenter - self.ThumbDeadZone:
                 return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
             else:
-            return 0.0
+                return 0.0
 
     def rover_command(self):
         ## method to update and publish velocity commands in rover mode
