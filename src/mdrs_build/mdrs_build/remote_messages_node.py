@@ -84,6 +84,7 @@ class RemoteComms(Node):
         self.arm_mode = False #rover mode by default
 
         self.prev_cmd = [] #for remote control rising edge
+        self.prev_cmd_arm = [] #for remote control rising edge
 
         ##initialise rover control variables - follow Emma's keyboard controls py file as template for updating and packaging as Twist
         self.lin_speed = 0.0
@@ -96,7 +97,7 @@ class RemoteComms(Node):
         # setting max limits
         self.max_lin_speed = 9.0
         self.max_ang_speed = 10.0
-        self.max_servo_lin = 0.02
+        self.max_servo_lin = 0.001
 
         # toggle for arm mode
         self.prev_toggle = [None, None]
@@ -154,6 +155,7 @@ class RemoteComms(Node):
                 newRThumbX = self.data.thumb_right_x if abs(self.data.thumb_right_x - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
                 newRThumbY = self.data.thumb_right_y if abs(self.data.thumb_right_y - self.ThumbCenter) > self.ThumbDeadZone else self.ThumbCenter
                 rThumbChange = self.ThumbRX != newRThumbX or self.ThumbRY != newRThumbY
+                lThumbChange = self.ThumbLX != newLThumbX or self.ThumbLY != newLThumbY
 
                 self.e_stop = self.data.e_stop # bool # overwriting emergency stop variable with actual input
                 self.LB = self.data.l_bottom # bool
@@ -192,9 +194,11 @@ class RemoteComms(Node):
                         self.rover_command()
                         self.prev_cmd = [self.LT,self.LB,self.LL,self.LR,self.RB]
                 elif self.arm_mode:
-                    # self.get_logger().info(f"Received ARM command")
-                    # self.print_remote_data()
+                    # if [self.LT,self.LB,self.LL,self.LR] != self.prev_cmd_arm or lThumbChange: # Maybe remove this later so that we can have continuous arm movement
+                        # self.get_logger().info(f"Received ARM command")
+                        # self.print_remote_data()
                     self.arm_command()
+                    self.prev_cmd_arm = [self.LT,self.LB,self.LL,self.LR]
 
         self.res = self.servo_calib_handle.access(self.servo_calib)
         if self.res >= 1024:
@@ -313,7 +317,8 @@ class RemoteComms(Node):
             self.end_grip = 1.0
 
         #print to debug
-        self.get_logger().info(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
+        if self.lin_x != 0.0 or self.lin_y != 0.0 or self.base != 0.0 or self.end_grip != 0.0:
+            self.get_logger().info(f"arm commands to send: {self.lin_x, self.lin_y, self.base, self.end_grip}")
 
         arm_cmd.linear.x = self.lin_x
         arm_cmd.linear.y = self.lin_y

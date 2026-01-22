@@ -25,11 +25,11 @@ class IKServoController(Node):
         
         self.get_logger().info("Homing Arm")
         # Arm lengths
-        self.l1 = 0.13814
-        self.l2 = 0.179
-        self.l3 = 0.19272
+        self.l1 = 0.11059
+        self.l2 = 0.18052
+        self.l3 = 0.16994
 
-        self.total_reach = self.l1 + self.l2 + self.l3 # 0.51012
+        self.total_reach = self.l2 + self.l3 # 0.51012
         self.current_x = 0.0
         self.current_y = self.total_reach - 0.05
         theta_1, theta_2 = self.compute_ik(dir='up')
@@ -64,7 +64,7 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_x = x
-                self.get_logger().info(f"Moving in X")
+                self.get_logger().info(f"Moving in X {dz}")
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
                 else:
@@ -83,13 +83,13 @@ class IKServoController(Node):
                 return None
             else:
                 self.current_y = y
-                self.get_logger().info(f"Moving in Y")
+                self.get_logger().info(f"Moving in Y {dz}")
                 if self.current_x >= 0:
                     self.compute_ik(dir='up')
                 else:
                     self.compute_ik(dir='down')
 
-        # Case 2: arm up/down
+        # Case 3: BOTH
         if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) > 1e-4:
             dx = msg.linear.x
             dy = msg.linear.y
@@ -104,11 +104,11 @@ class IKServoController(Node):
             else:
                 self.current_x = x
                 self.current_y = y
-                self.get_logger().info(f"Moving in BOTH X Y")
-                if self.current_x >= 0:
-                    self.compute_ik(dir='up')
-                else:
-                    self.compute_ik(dir='down')
+                self.get_logger().info(f"Moving in BOTH X Y {dx, dy}")
+                # if self.current_x >= 0:
+                #     self.compute_ik(dir='up')
+                # else:
+                #     self.compute_ik(dir='down')
 
         # Case 3: arm base rotation
         if abs(msg.angular.x) > 1e-4:
@@ -121,30 +121,41 @@ class IKServoController(Node):
             dz = msg.linear.z * 3
             self.gripper_curr += dz
             self.send_to_servo(self.gripper_curr, self.gripper)
-        else:
-            self.get_logger().info("No arm movement command received.")
+        # else:
+            # self.get_logger().info("No arm movement command received.")
 
 
     def compute_ik(self, dir='up'):
         self.get_logger().info(f"Computing IK for current_x: {self.current_x}, current_y: {self.current_y}")
-        y = self.current_y - self.l1  # Adjust for base height
-        x = self.current_x
-        d = math.sqrt(x**2 + y**2)
-        q2 = math.acos((self.l2**2 + self.l3**2 - d**2) / (2 * self.l2 * self.l3))
-        if dir == 'up':
-            q2 = -q2
-        
-        q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
-        q1 = math.degrees(q1)
-        q2 = math.degrees(q2)
-        self.theta_1_curr = 270-q1
-        self.theta_2_curr = q2
-        theta_1_servo = 135 + (90 - q1) # Example mapping, adjust sign as needed
-        theta_2_servo = 135 + q2
+        y = self.current_y  # Adjust for base height # 0.30046
+        x = self.current_x # 0
+        d = math.sqrt(x**2 + y**2)  # 0.30046
+        try:
+            q2 = math.acos((d**2 - self.l2**2 - self.l3**2) / (2 * self.l2 * self.l3))
+            if dir == 'up':
+                q2 = -q2
+            
+            q1 = math.atan2(y, x) - math.atan2(self.l3 * math.sin(q2), self.l2 + self.l3 * math.cos(q2))
+            q1_deg = math.degrees(q1)
+            q2_deg = math.degrees(q2)
 
-        self.get_logger().info(f"Computed angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
-        self.send_to_servo(theta_1_servo, self.theta_1)
-        self.send_to_servo(theta_2_servo, self.theta_2)
+            self.theta_1_curr = q1_deg # updates current
+            self.theta_2_curr = q2_deg
+
+            theta_1_servo = 270 - (135 - 90 + q1_deg)
+            theta_2_servo = 135 + q2_deg
+
+            self.get_logger().info(f"Computed angles: theta_1={q1_deg:.1f}, theta_2={q2_deg:.1f}")
+            self.get_logger().info(f"Setting angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
+
+            self.send_to_servo(theta_1_servo, self.theta_1)
+            self.send_to_servo(theta_2_servo, self.theta_2)
+
+        except ValueError as e:
+            self.get_logger().error(f"Error computing IK: {e}")
+            self.get_logger().info(f"Input values: x={x}, y={y}, d={d}")
+            self.get_logger().info(f"differential: {self.l2**2 + self.l3**2 - d**2}")
+            q1, q2 = None, None
 
         return q1, q2
 
