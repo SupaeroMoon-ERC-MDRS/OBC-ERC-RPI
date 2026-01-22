@@ -1,7 +1,12 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from ament_index_python.packages import get_package_share_directory
+import os
 
 def generate_launch_description():
+    pkg_my_robot = get_package_share_directory('mdrs_build')
+
+    camera_calib = os.path.join(pkg_my_robot, 'config', 'camera_calib.yaml')
     return LaunchDescription([
         # steering controller
         Node(
@@ -35,13 +40,13 @@ def generate_launch_description():
             output='screen'
         ),
 
-        aruco_node = Node(
+        Node(
             package='mdrs_build',
             executable='aruco_pub',
             parameters=[{'target_marker_id': 0, 'camera_calib_file': camera_calib}] 
         ),
 
-        marker_follower_node = Node(
+        Node(
             package='mdrs_build',
             executable='marker_follower',
             name='marker_follower',
