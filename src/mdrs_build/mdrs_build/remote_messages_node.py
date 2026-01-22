@@ -251,20 +251,12 @@ class RemoteComms(Node):
                         ")
                 
 
-    def thumb_curve(self, x):
-        if self.arm_mode:
-            if x > self.ThumbCenter + self.ThumbDeadZone_arm:
-                return (1.3 ** ((x - self.ThumbDeadZone_arm - self.ThumbDeadZone_arm) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone_arm) / 10) - 1)
-            elif x < self.ThumbCenter - self.ThumbDeadZone_arm:
-                return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone_arm) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone_arm) / 10) - 1)
-            else:
-                return 0.0
+    def thumb_curve(self, x, dead_zone):
+        if x > self.ThumbCenter + dead_zone:
+            return (1.3 ** ((x - self.ThumbCenter - dead_zone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - dead_zone) / 10) - 1)
+        elif x < self.ThumbCenter - dead_zone:
+            return -(1.3 ** ((self.ThumbCenter - x - dead_zone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - dead_zone) / 10) - 1)
         else:
-            if x > self.ThumbCenter + self.ThumbDeadZone:
-                return (1.3 ** ((x - self.ThumbCenter - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
-            elif x < self.ThumbCenter - self.ThumbDeadZone:
-                return -(1.3 ** ((self.ThumbCenter - x - self.ThumbDeadZone) / 10) - 1) / (1.3 ** ((self.ThumbCenter - self.ThumbDeadZone) / 10) - 1)
-            else:
             return 0.0
 
     def rover_command(self):
@@ -279,8 +271,8 @@ class RemoteComms(Node):
         elif self.LR:
             self.ang_speed -= self.ang_inc
         else:
-            self.ang_speed = self.thumb_curve(self.ThumbLX) * self.max_ang_speed
-            self.lin_speed = self.thumb_curve(self.ThumbLY) * self.max_lin_speed
+            self.ang_speed = self.thumb_curve(self.ThumbLX, self.ThumbDeadZone) * self.max_ang_speed
+            self.lin_speed = self.thumb_curve(self.ThumbLY, self.ThumbDeadZone) * self.max_lin_speed
 
         # Clamp the speeds to their maximum values
         self.lin_speed = max(min(self.lin_speed, self.max_lin_speed), -self.max_lin_speed)
@@ -309,10 +301,8 @@ class RemoteComms(Node):
         self.base = 0.0 #gripper open/close
         self.end_grip = 0.0 #wrist rotation
 
-        if self.ThumbLX:
-            self.lin_x = self.thumb_curve(self.ThumbLX) * self.max_servo_lin
-        if self.ThumbLY:
-            self.lin_y = self.thumb_curve(self.ThumbLY) * self.max_servo_lin
+        self.lin_x = self.thumb_curve(self.ThumbLX, self.ThumbDeadZone_arm) * self.max_servo_lin
+        self.lin_y = self.thumb_curve(self.ThumbLY, self.ThumbDeadZone_arm) * self.max_servo_lin
         if self.LL: # arm base left
             self.base = 1.0
         elif self.LR: # arm base right
