@@ -19,12 +19,18 @@ class UdpCamera(Node):
         self.timer = self.create_timer(0.033, self.timer_callback) # 30 FPS
 
     def timer_callback(self):
-        ret, frame = self.cap.read()
-        if ret:
-            msg = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
-            msg.header.stamp = self.get_clock().now().to_msg()
-            msg.header.frame_id = "camera_link"
-            self.publisher_.publish(msg)
+            ret, frame = self.cap.read()
+            
+            if ret:
+                # FRAME WAS READ SUCCESSFULLY
+                msg = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+                msg.header.stamp = self.get_clock().now().to_msg()
+                msg.header.frame_id = "camera_link"
+                self.publisher_.publish(msg)
+                # print("Published frame!")  # <--- Uncomment this to verify flow
+            else:
+                # FRAME READING FAILED
+                self.get_logger().warn("Failed to capture frame from stream!")
 
 def main(args=None):
     rclpy.init(args=args)
