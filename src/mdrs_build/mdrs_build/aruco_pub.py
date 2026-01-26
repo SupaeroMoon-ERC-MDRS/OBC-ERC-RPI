@@ -58,7 +58,7 @@ class ArucoPosePublisher(Node):
         # need to be given the camera calib file, for matrix and distortion coefficients
         calib_file = self.declare_parameter('camera_calib_file', 'camera_calibration.txt').value
        
-        self.image_topic = self.declare_parameter('image_topic', '/camera/left/image_raw').value
+        self.image_topic = self.declare_parameter('image_topic', '/camera/image_raw').value
         self.camera_frame = self.declare_parameter('camera_frame', 'camera_link').value
 
         # TARGET marker ID (e.g. 23)
