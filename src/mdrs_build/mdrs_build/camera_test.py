@@ -11,7 +11,7 @@ class UdpCamera(Node):
         self.bridge = CvBridge()
 
         # Connect to the stream coming from the Host
-        self.cap = cv2.VideoCapture('udp://127.0.0.1:5000?overrun_nonfatal=1&fifo_size=50000000', cv2.CAP_FFMPEG)
+        self.cap = cv2.VideoCapture('tcp://127.0.0.1:5000', cv2.CAP_FFMPEG)
 
         if not self.cap.isOpened():
             self.get_logger().error("Could not open video stream")
