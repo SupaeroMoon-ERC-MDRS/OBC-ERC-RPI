@@ -11,7 +11,8 @@ class UdpCamera(Node):
         self.bridge = CvBridge()
 
         # Connect to the stream coming from the Host
-        self.cap = cv2.VideoCapture('tcp://127.0.0.1:5000', cv2.CAP_FFMPEG)
+        # Change your VideoCapture line to this:
+        self.cap = cv2.VideoCapture('udp://127.0.0.1:5000?overrun_nonfatal=1&fifo_size=50000000', cv2.CAP_FFMPEG)
 
         if not self.cap.isOpened():
             self.get_logger().error("Could not open video stream")
@@ -22,15 +23,16 @@ class UdpCamera(Node):
             ret, frame = self.cap.read()
             
             if ret:
-                # FRAME WAS READ SUCCESSFULLY
+                # Success - Publish the image
                 msg = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
                 msg.header.stamp = self.get_clock().now().to_msg()
                 msg.header.frame_id = "camera_link"
                 self.publisher_.publish(msg)
-                # print("Published frame!")  # <--- Uncomment this to verify flow
             else:
-                # FRAME READING FAILED
-                self.get_logger().warn("Failed to capture frame from stream!")
+                # Failure - Try to reconnect instead of giving up
+                self.get_logger().warn("Frame lost, attempting to reconnect...")
+                self.cap.release()
+                self.cap = cv2.VideoCapture('udp://127.0.0.1:5000?overrun_nonfatal=1&fifo_size=50000000', cv2.CAP_FFMPEG)
 
 def main(args=None):
     rclpy.init(args=args)
