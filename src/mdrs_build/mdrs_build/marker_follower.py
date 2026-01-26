@@ -106,7 +106,10 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        pass
+        twist = Twist()
+        twist.linear.x = 0.0
+        twist.angular.z = 0.0
+        node.pub_vel.publish(twist)
     finally:
         node.destroy_node()
         rclpy.shutdown()
