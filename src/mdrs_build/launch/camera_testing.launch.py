@@ -41,8 +41,8 @@ def generate_launch_description():
         # ),
         Node(
             package='mdrs_build',
-            executable='camera_ros',
-            name='camera_node',
+            executable='camera_stream',
+            name='camera_stream',
             output='screen'
         ),
 
@@ -52,11 +52,11 @@ def generate_launch_description():
             parameters=[{'target_marker_id': 0, 'camera_calib_file': camera_calib}] 
         ),
 
-        Node(
-            package='mdrs_build',
-            executable='marker_follower',
-            name='marker_follower',
-            output='screen'
-        )
+        # Node(
+        #     package='mdrs_build',
+        #     executable='marker_follower',
+        #     name='marker_follower',
+        #     output='screen'
+        # )
 
     ])

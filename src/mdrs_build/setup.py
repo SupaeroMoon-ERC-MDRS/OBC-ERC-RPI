@@ -42,6 +42,7 @@ setup(
             'aruco_pub = mdrs_build.aruco_pub:main',
             'marker_follower = mdrs_build.marker_follower:main',
             'stereo_camera = mdrs_build.stereo_camera:main',
+            'camera_stream = mdrs_build.camera_stream:main',
         ],
     },
 )
