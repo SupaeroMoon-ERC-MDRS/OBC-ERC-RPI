@@ -32,10 +32,10 @@ class IKServoController(Node):
         self.total_reach = self.l2 + self.l3 # 0.51012
         self.current_x = 0.0
         self.current_y = self.total_reach - 0.05
+        self.go_home()
         theta_1, theta_2 = self.compute_ik(dir='up')
 
-
-        self.base_curr = 0.0
+        self.base_curr = 90.0
         self.theta_1_curr = theta_1
         self.theta_2_curr = theta_2
         self.gripper_curr = 90.0
@@ -167,7 +167,7 @@ class IKServoController(Node):
 
     def go_home(self):
         self.get_logger().info("Returning to home position.")
-        self.send_to_servo(135.0, self.base)
+        self.send_to_servo(90.0, self.base)
         self.send_to_servo(135.0, self.theta_1)
         self.send_to_servo(135.0, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
