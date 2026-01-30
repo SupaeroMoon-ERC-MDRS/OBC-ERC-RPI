@@ -74,7 +74,7 @@ class IKServoController(Node):
         if abs(msg.linear.y) > 1e-4 and abs(msg.linear.x) < 1e-4:
             dz = msg.linear.y
             x = self.current_x
-            y = self.current_y + dz
+            y = self.current_y - dz
             d = math.sqrt(x**2 + y**2)
             if abs(d) > self.total_reach:
                 self.get_logger().info(f"Current x is {x}, current y is {y}, total reach is {d}")
