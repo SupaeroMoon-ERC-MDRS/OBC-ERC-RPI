@@ -94,7 +94,7 @@ class IKServoController(Node):
             dx = msg.linear.x
             dy = msg.linear.y
             x = self.current_x + dx
-            y = self.current_y + dy
+            y = self.current_y - dy
             d = math.sqrt(x**2 + y**2)
             if abs(d) > self.total_reach:
                 self.get_logger().info(f"Current x is {x}, current y is {y}, total reach is {d}")
@@ -105,10 +105,10 @@ class IKServoController(Node):
                 self.current_x = x
                 self.current_y = y
                 self.get_logger().info(f"Moving in BOTH X Y {dx, dy}")
-                # if self.current_x >= 0:
-                #     self.compute_ik(dir='up')
-                # else:
-                #     self.compute_ik(dir='down')
+                if self.current_x >= 0:
+                    self.compute_ik(dir='up')
+                else:
+                    self.compute_ik(dir='down')
 
         # Case 3: arm base rotation
         if abs(msg.angular.x) > 1e-4:
