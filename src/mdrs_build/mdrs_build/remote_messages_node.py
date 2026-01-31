@@ -37,7 +37,7 @@ class RemoteComms(Node):
 
         self.odom_sub = self.create_subscription(Odometry, '/enc_odom', self.process_odom, 10)
         self.motor_telem_sub = self.create_subscription(Float64MultiArray, '/wheel_controller/commands_telem', self.process_motor, 10)
-        self.arm_telem_sub = self.create_publisher(Float64MultiArray, '/arm_telem', self.process_arm, 10)
+        self.arm_telem_sub = self.create_subscription(Float64MultiArray, '/arm_telem', self.process_arm, 10)
         #self.cmd_arm_grip_pub = self.create_publisher(msg_type=Bool,topic="/cmd_grip_arm",qos_profile=10)
         # self.odom_sub = self.create_subscription(msg_type=Odometry,topic="/odom",callback = self.rec_odom ,qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
         """The queue size has been set to 10 for now, but it can be changed as necessary"""
