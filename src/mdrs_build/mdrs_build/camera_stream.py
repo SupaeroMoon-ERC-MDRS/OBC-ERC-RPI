@@ -3,6 +3,10 @@ from rclpy.node import Node
 import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+from time import sleep
+from subprocess import run
+import re
+import socket as s
 
 
 class UdpCamera(Node):
@@ -13,7 +17,9 @@ class UdpCamera(Node):
         # add commandline argument to specify local IP or not
         # Connect to the stream coming from the Host
         # Change your VideoCapture line to this:
-        self.address = f"http://ip:13000/stream.mjpg"
+        _, _, _, wlan0_ips, _ = self.getIntf()
+        self.ip = wlan0_ips
+        self.address = f"http://{self.ip[0]}:13000/stream.mjpg"         
         self.cap = cv2.VideoCapture(self.address, cv2.CAP_FFMPEG)
 
         if not self.cap.isOpened():
@@ -37,6 +43,79 @@ class UdpCamera(Node):
                 self.get_logger().warn("Frame lost, attempting to reconnect...")
                 self.cap.release()
                 self.cap = cv2.VideoCapture(self.address, cv2.CAP_FFMPEG)
+
+    def getIntf(self):
+        output = run(["ip", "a"], capture_output=True, text=True).stdout
+        
+        tmp = re.findall(r"[0-9]: [a-z0-9]*:", output)
+        allifs = []
+        for t in tmp:
+            if t.__contains__("eth0") or t.__contains__("wlan0"):
+                pass
+            else:
+                allifs.append(t)
+
+        lines = output.split("\n")
+
+        lines_if_eth0 = []
+        is_eth0 = False
+        lines_if_wlan0 = []
+        is_wlan0 = False
+
+        for line in lines:
+
+            isifdec = False
+            for ifn in allifs:
+                if line.__contains__(ifn):
+                    isifdec = True
+                    break
+
+            if line.__contains__("eth0"):
+                is_eth0 = True
+                is_wlan0 = False
+            elif line.__contains__("wlan0"):
+                is_wlan0 = True
+                is_eth0 = False
+            elif isifdec:
+                is_wlan0 = False
+                is_eth0 = False
+
+            if is_eth0:
+                lines_if_eth0.append(line)
+            
+            if is_wlan0:
+                lines_if_wlan0.append(line)
+
+        wlan0_ips = []
+        wlan0_up = lines_if_wlan0[0].__contains__("state UP")
+        for line in lines_if_wlan0:
+            if line.__contains__("inet "):
+                wlan0_ips.append(re.findall(r"[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}\/[0-9]{1,2}", line)[0].split('/')[0])
+
+        eth0_ips = []
+        eth0_up = lines_if_eth0[0].__contains__("state UP")
+        for line in lines_if_eth0:
+            if line.__contains__("inet "):
+                eth0_ips.append(re.findall(r"[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}\/[0-9]{1,2}", line)[0].split('/')[0])
+
+        msg = ""
+        if eth0_up:
+            msg += "The interface eth0 is up\n"
+            for ip in eth0_ips:
+                msg += f"IP for eth0: {ip}\n"
+        else:
+            msg += "The interface eth0 is not up\n"
+            
+        if wlan0_up:
+            msg += "The interface wlan0 is up\n"
+            for ip in wlan0_ips:
+                msg += f"IP for wlan0: {ip}\n"
+        else:
+            msg += "The interface wlan0 is not up\n"
+
+        print(msg)
+
+        return eth0_up, eth0_ips, wlan0_up, wlan0_ips, msg
 
 
 def main(args=None):
