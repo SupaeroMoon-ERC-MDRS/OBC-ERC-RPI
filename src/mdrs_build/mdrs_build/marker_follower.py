@@ -42,41 +42,41 @@ class SimpleMarkerFollower(Node):
 
         self.get_logger().info('SimpleMarkerFollower started. Tracking /aruco_marker_pose directly.')
 
-    def marker_cb(self, msg: PoseStamped):
-        """
-        Callback when a marker pose is received in camera/robot frame.
-        We assume the publisher sends pose where:
-        X = Forward distance
-        Y = Lateral (Left)
-        Z = Vertical
-        """
+def marker_cb(self, msg: PoseStamped):
         self.marker_visible = True
         self.last_marker_time = self.get_clock().now()
 
-        # 1. Calculate errors
-        # Distance error: we want to be at 'safe_follow_distance'
-        current_dist = msg.pose.position.x
-        dist_error = current_dist - self.safe_follow_distance
+        # --- COORDINATE TRANSFORMATION ---
+        # Camera Optical Frame: Z=Forward, X=Right, Y=Down
+        # Robot Body Frame:     X=Forward, Y=Left,  Z=Up
+        
+        # 1. Get Forward Distance (Camera Z)
+        # We subtract safe_follow_distance from Z
+        forward_dist = msg.pose.position.z 
+        dist_error = forward_dist - self.safe_follow_distance
 
-        # Angle error: we want to center the marker (Y=0)
-        # Using atan2 to get the angle in radians
-        angle_error = math.atan2(msg.pose.position.y, msg.pose.position.x)
+        # 2. Get Lateral Error (Robot Y is Camera -X)
+        lateral_offset = -msg.pose.position.x
+        
+        # 3. Calculate Angle to Marker (Yaw)
+        # atan2(Y, X) -> atan2(Left, Forward)
+        angle_error = math.atan2(lateral_offset, forward_dist)
 
-        # 2. Compute control commands (P-controller)
-        lin_cmd = self.kp_dist * dist_error
-        ang_cmd = self.kp_ang * angle_error
+        # --- CONTROL LOGIC (Point & Shoot) ---
+        heading_tolerance = 0.1 # Radians
 
-        # 3. Apply limits
-        # If we are too close (negative error), valid to backup (negative vel)
-        # but usually we clamp max speed magnitude
+        if abs(angle_error) > heading_tolerance:
+            # Turn in place if not facing target
+            lin_cmd = 0.0
+            ang_cmd = self.kp_ang * angle_error
+        else:
+            # Drive and steer
+            lin_cmd = self.kp_dist * dist_error
+            ang_cmd = self.kp_ang * angle_error
+
+        # Limits
         lin_cmd = max(min(lin_cmd, self.max_linear_vel), -self.max_linear_vel)
         ang_cmd = max(min(ang_cmd, self.max_angular_vel), -self.max_angular_vel)
-
-        # Deadband / Stop if very close to target
-        if abs(dist_error) < 0.05:
-            lin_cmd = 0.0
-        if abs(angle_error) < 0.05:
-            ang_cmd = 0.0
 
         self.target_linear = lin_cmd
         self.target_angular = ang_cmd
