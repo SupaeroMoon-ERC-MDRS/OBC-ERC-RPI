@@ -108,7 +108,7 @@ class ArucoPosePublisher(Node):
         scale_x = w_stream / self.calib_width
         scale_y = h_stream / self.calib_height
 
-        current_mtx = np.copy(self.raw_mtx)
+        current_mtx = np.copy(self.mtx)
         
         # Scale Focal Lengths (fx, fy)
         current_mtx[0, 0] *= scale_x  # fx
@@ -117,8 +117,8 @@ class ArucoPosePublisher(Node):
         # Scale & Flip Optical Center (cx, cy)
         # Because we rotated 180, the "center" pixel moves to the other side
         # New Center = Width - (Old_Center * Scale)
-        current_mtx[0, 2] = w_stream - (self.raw_mtx[0, 2] * scale_x)
-        current_mtx[1, 2] = h_stream - (self.raw_mtx[1, 2] * scale_y)
+        current_mtx[0, 2] = w_stream - (self.mtx[0, 2] * scale_x)
+        current_mtx[1, 2] = h_stream - (self.mtx[1, 2] * scale_y)
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
