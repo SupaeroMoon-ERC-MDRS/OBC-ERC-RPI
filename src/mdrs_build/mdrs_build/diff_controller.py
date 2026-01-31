@@ -64,7 +64,7 @@ class DifferentialDriveController(Node):
             self.get_logger().info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             self.get_logger().info(f"STARTING PIVOT TURN at speed {angular_velocity}")
             self.get_logger().info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            turn_speed = angular_velocity * ROVER_WHEEL_RADIUS
+            turn_speed = angular_velocity * (TRACK_WIDTH / 2.0)
             left_vel = -turn_speed
             right_vel = turn_speed
             return (left_vel, left_vel, left_vel, right_vel, right_vel, right_vel)

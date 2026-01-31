@@ -15,14 +15,13 @@ class SimpleMarkerFollower(Node):
         super().__init__('simple_marker_follower')
 
         # Parameters
-        self.safe_follow_distance = self.declare_parameter('safe_follow_distance', 0.8).value
-        self.max_linear_vel = self.declare_parameter('max_linear_vel', 0.5).value
-        self.max_angular_vel = self.declare_parameter('max_angular_vel', 1.0).value
+        self.safe_follow_distance = 0.8
+        self.max_linear_vel = 0.5
+        self.max_angular_vel = 1.0
         
         # Gains for the proportional controller
-        self.kp_dist = self.declare_parameter('kp_dist', 0.5).value
-        self.kp_ang = self.declare_parameter('kp_ang', 1.5).value
-
+        self.kp_dist = 0.5
+        self.kp_ang = 0.5
         # Topics
         self.sub = self.create_subscription(
             PoseStamped,
