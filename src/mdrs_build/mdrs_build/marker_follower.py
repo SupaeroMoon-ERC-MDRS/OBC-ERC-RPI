@@ -15,7 +15,7 @@ class SimpleMarkerFollower(Node):
 
         # Parameters
         self.safe_follow_distance = 0.8
-        self.max_linear_vel = 3.0
+        self.max_linear_vel = 1.0
         self.max_angular_vel = 10.0
         
         # Gains for the proportional controller
@@ -104,11 +104,12 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
+        pass
+    finally:
         twist = Twist()
         twist.linear.x = 0.0
         twist.angular.z = 0.0
         node.pub_vel.publish(twist)
-    finally:
         node.destroy_node()
         rclpy.shutdown()
 
