@@ -171,9 +171,9 @@ class RemoteComms(Node):
                 self.L2 = self.data.left_trigger # int 0-255 # L2 on PS4, LT on Xbox
                 self.R2 = self.data.right_trigger # int 0-255 # R2 on PS4, RT on Xbox
                 self.ThumbLX = newLThumbX # int 0-255
-                self.ThumbLY = newLThumbY # int 0-255
+                self.ThumbLY = -newLThumbY # int 0-255 (inverted to make up up)
                 self.ThumbRX = newRThumbX # int 0-255 
-                self.ThumbRY = newRThumbY # int 0-255
+                self.ThumbRY = -newRThumbY # int 0-255
 
                 # self.get_logger().error(self)
 
