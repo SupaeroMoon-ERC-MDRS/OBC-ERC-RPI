@@ -91,8 +91,8 @@ class RoboclawNode(Node):
             vel_rr = msg.data[3]
             vel_ml = msg.data[4]
             vel_mr = msg.data[5]
-            rights = [vel_fr, vel_mr, vel_rr]
-            lefts = [vel_fl, vel_ml, vel_rl]
+            rights = [vel_fr, vel_rr, vel_mr]
+            lefts = [vel_fl, vel_rl, vel_ml]
             
             for i, address in enumerate(self.addresses): # Double check order of motors
                 right_speed = rights[i]
