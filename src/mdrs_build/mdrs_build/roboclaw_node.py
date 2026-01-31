@@ -18,6 +18,7 @@ class RoboclawNode(Node):
         self.subscription = self.create_subscription(Float64MultiArray, '/wheel_controller/commands',
             self.cmd_vel_motors, 10
         )
+        self.motor_telem_pub = self.create_publisher(Float64MultiArray, '/wheel_controller/commands_telem', 10)
         self.odom_pub = self.create_publisher(Odometry, '/enc_odom', 10)
 
 
@@ -93,6 +94,9 @@ class RoboclawNode(Node):
             vel_mr = msg.data[5]
             rights = [vel_fr, vel_rr, vel_mr]
             lefts = [vel_fl, vel_rl, vel_ml]
+
+            rights_telem = [None, None, None]
+            lefts_telem = [None, None, None]
             
             for i, address in enumerate(self.addresses): # Double check order of motors
                 right_speed = rights[i]
@@ -101,6 +105,10 @@ class RoboclawNode(Node):
                 # Ticks conversion
                 qppsm1 = self.vel_to_qpps(left_speed)
                 qppsm2 = self.vel_to_qpps(right_speed)
+
+                lefts_telem[i] = qppsm1
+                rights_telem[i] = qppsm2
+
                 self.get_logger().debug(f"Attempting to set motor {address} to speed {qppsm1} (M1), {qppsm2} (M2)")
                 self.robo.DutyAccelM1(address, self.accel, qppsm1)
                 self.robo.DutyAccelM2(address, self.accel, qppsm2)
@@ -109,6 +117,13 @@ class RoboclawNode(Node):
                 # Update timestamp
                 self.last_set_speed_time = time.time()
             self.update_odometry()
+
+            msg = Float64MultiArray()
+            msg.data = [
+                float(lefts_telem[0]), float(rights_telem[0]), float(lefts_telem[1]), float(rights_telem[1]), float(lefts_telem[2]), float(rights_telem[2])
+            ]
+            self.motor_telem_pub.publish(msg)
+
         except Exception as e:
             self.get_logger().error(f"Motor command failed: {str(e)}")
             self.shutdown()

@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Float64MultiArray
 import math
 # Init Adafruit PCA9685
 from adafruit_pca9685 import PCA9685
@@ -40,10 +41,18 @@ class IKServoController(Node):
         self.theta_2_curr = theta_2
         self.gripper_curr = 90.0
 
+        self.servo_telem = [None, None, None, None]
+
         self.subscription = self.create_subscription(
             Twist,
             '/cmd_move_arm',
             self.cmd_callback,
+            10
+        )
+
+        self.telem_pub = self.create_publisher(
+            Float64MultiArray,
+            '/arm_telem',
             10
         )
 
@@ -114,15 +123,21 @@ class IKServoController(Node):
         if abs(msg.angular.x) > 1e-4:
             dtheta = msg.angular.x * 3
             self.base_curr += dtheta
+            self.servo_telem[0] = self.base_curr
             self.send_to_servo(self.base_curr, self.base)
 
         # Case 4: arm gripper open/close
         if abs(msg.linear.z) > 1e-4:
             dz = msg.linear.z * 3
             self.gripper_curr += dz
+            self.servo_telem[3] = self.gripper_curr
             self.send_to_servo(self.gripper_curr, self.gripper)
         # else:
             # self.get_logger().info("No arm movement command received.")
+
+        msg = Float64MultiArray()
+        msg.data = self.servo_telem
+        self.telem_pub.publish(msg)
 
 
     def compute_ik(self, dir='up'):
@@ -151,6 +166,9 @@ class IKServoController(Node):
             self.send_to_servo(theta_1_servo, self.theta_1)
             self.send_to_servo(theta_2_servo, self.theta_2)
 
+            self.servo_telem[1] = theta_1_servo
+            self.servo_telem[2] = theta_2_servo
+
         except ValueError as e:
             self.get_logger().error(f"Error computing IK: {e}")
             self.get_logger().info(f"Input values: x={x}, y={y}, d={d}")
@@ -171,6 +189,11 @@ class IKServoController(Node):
         self.send_to_servo(135.0, self.theta_1)
         self.send_to_servo(135.0, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
+
+        msg = Float64MultiArray()
+        msg.data = [90.0, 135.0, 135.0, 90.0]
+        self.telem_pub.publish(msg)
+
     
 def main(args=None):
     rclpy.init(args=args)
