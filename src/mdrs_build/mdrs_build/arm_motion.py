@@ -112,7 +112,7 @@ class IKServoController(Node):
 
         # Case 3: arm base rotation
         if abs(msg.angular.x) > 1e-4:
-            dtheta = msg.angular.x * 10
+            dtheta = msg.angular.x * 3
             self.base_curr += dtheta
             self.send_to_servo(self.base_curr, self.base)
 
