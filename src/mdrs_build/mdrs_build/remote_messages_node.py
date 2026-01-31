@@ -95,8 +95,8 @@ class RemoteComms(Node):
         self.ang_inc = 0.2
 
         # setting max limits
-        self.max_lin_speed = 9.0
-        self.max_ang_speed = 10.0
+        self.max_lin_speed = 3.0
+        self.max_ang_speed = 5.0
         self.max_servo_lin = 0.01
 
         # toggle for arm mode
