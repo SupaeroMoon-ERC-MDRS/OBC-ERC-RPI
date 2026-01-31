@@ -23,15 +23,13 @@ def generate_launch_description():
             name='roboclaw_node',
             output='screen'
         ),
-
-
-        # This function drives the arm
         Node(
             package='mdrs_build',
-            executable='arm_motion',
-            name='arm_motion',
+            executable='camera_stream',
+            name='camera_stream',
             output='screen'
         ),
+
         # Communication between remote control and rover
         Node(
             package='mdrs_build',
