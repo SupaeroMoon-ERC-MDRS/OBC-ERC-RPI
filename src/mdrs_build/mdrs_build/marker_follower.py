@@ -19,7 +19,7 @@ class SimpleMarkerFollower(Node):
         self.max_angular_vel = 10.0
         
         # Gains for the proportional controller
-        self.kp_dist = 1.5
+        self.kp_dist = 0.5
         self.kp_ang = 1.5
         # Topics
         self.sub = self.create_subscription(
