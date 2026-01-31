@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-
-from build.sim_mdrs.build.lib.sim_mdrs.roboclaw_node import msg
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Twist
