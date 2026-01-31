@@ -92,7 +92,7 @@ class SimpleMarkerFollower(Node):
             self.target_linear = 0.0
             self.target_angular = 0.0
             # Optional: print once that we lost the marker
-            # self.get_logger().info('Marker lost, stopping...', throttle_duration_sec=2.0)
+            self.get_logger().info('Marker lost, stopping...', throttle_duration_sec=2.0)
 
         # Publish command
         twist = Twist()
