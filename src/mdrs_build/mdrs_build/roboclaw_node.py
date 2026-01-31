@@ -101,10 +101,10 @@ class RoboclawNode(Node):
                 # Ticks conversion
                 qppsm1 = self.vel_to_qpps(left_speed)
                 qppsm2 = self.vel_to_qpps(right_speed)
-                self.get_logger().info(f"Attempting to set motor {address} to speed {qppsm1} (M1), {qppsm2} (M2)")
+                self.get_logger().debug(f"Attempting to set motor {address} to speed {qppsm1} (M1), {qppsm2} (M2)")
                 self.robo.DutyAccelM1(address, self.accel, qppsm1)
                 self.robo.DutyAccelM2(address, self.accel, qppsm2)
-                self.get_logger().info(f"Motor {address} set to speed: {qppsm1} (M1), {qppsm2} (M2)")
+                self.get_logger().debug(f"Motor {address} set to speed: {qppsm1} (M1), {qppsm2} (M2)")
 
                 # Update timestamp
                 self.last_set_speed_time = time.time()
