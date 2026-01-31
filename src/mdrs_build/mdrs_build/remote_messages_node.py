@@ -133,13 +133,41 @@ class RemoteComms(Node):
         # Timer to run remote input method repeatedly once the Node is initialised
         self.timer = self.create_timer(0.2,self.remote_input)
         self.tempTimer = self.create_timer(0.01,self.sendTelemetryTemporary)
+        self.flushtimer = self.create_timer(0.5,self.flushall)
+
+        self.pushed = {
+            "raspi": False,
+            "loco": False,
+            "arm": False,
+        }
+
+    def flushClear(self):
+        self.nh.flush()
+        self.pushed = {
+            "raspi": False,
+            "loco": False,
+            "arm": False,
+        }
+
+    def flushall(self):
+        #self.nh.pushRaspiState()
+        if not self.pushed["loco"]:
+            self.nh.pushNavLocomotion()
+        
+        if not self.pushed["arm"]:
+            self.nav_arm.arm_active = self.arm_mode
+            self.nav_arm_handle.update(self.nav_arm)
+            self.nh.pushNavArm()
+
+        self.flushClear()
 
     def sendTelemetryTemporary(self):
         if self.rsc.poll(self.raspi):
+            if self.pushed["raspi"]:
+                self.flushClear()
             self.raspihandle.update(self.raspi)
             self.nh.pushRaspiState()
-
-        self.nh.flush()
+            self.pushed["raspi"] = True
 
     def sendCalibState(self, msg):
         calib = ServoCalibState()
@@ -160,8 +188,11 @@ class RemoteComms(Node):
         self.nav_locomotion.motor_mr_target = msg.data[3]
         self.nav_locomotion.motor_rl_target = msg.data[4]
         self.nav_locomotion.motor_rr_target = msg.data[5]
+        if self.pushed["loco"]:
+            self.flushClear()
         self.nav_locomotion_handle.update(self.nav_locomotion)
         self.nh.pushNavLocomotion()
+        self.pushed["loco"] = True
 
     def process_arm(self, msg: Float64MultiArray):
         self.nav_arm.arm_active = self.arm_mode
@@ -169,8 +200,11 @@ class RemoteComms(Node):
         self.nav_arm.joint_1 = msg.data[1]
         self.nav_arm.joint_2 = msg.data[2]
         self.nav_arm.joint_3 = msg.data[3]
+        if self.pushed["arm"]:
+            self.flushClear()
         self.nav_arm_handle.update(self.nav_arm)
         self.nh.pushNavArm()
+        self.pushed["arm"] = True
 
     def remote_input(self):
         self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
