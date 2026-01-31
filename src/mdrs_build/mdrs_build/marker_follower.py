@@ -61,7 +61,7 @@ class SimpleMarkerFollower(Node):
         angle_error = math.atan2(lateral_error, forward_dist)
 
         # --- CONTROL LOGIC (Point & Shoot) ---
-        heading_tolerance = 0.5 # Radians
+        heading_tolerance = 1.0 # Radians
 
         if abs(angle_error) > heading_tolerance:
             # Turn in place if not facing target
