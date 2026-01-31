@@ -42,7 +42,7 @@ class SimpleMarkerFollower(Node):
 
         self.get_logger().info('SimpleMarkerFollower started. Tracking /aruco_marker_pose directly.')
 
-def marker_cb(self, msg: PoseStamped):
+    def marker_cb(self, msg: PoseStamped):
         self.marker_visible = True
         self.last_marker_time = self.get_clock().now()
 
