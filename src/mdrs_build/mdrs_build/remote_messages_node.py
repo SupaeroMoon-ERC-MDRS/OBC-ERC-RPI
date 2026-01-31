@@ -1,6 +1,6 @@
 ## To create a ROS node to process incoming messages from the remote control
 """To be tested"""
-from udpcanpy import NetworkHandler, RemoteControl, RaspiState, ServoCalibState #to access the UPDCAN protocol
+from udpcanpy import NetworkHandler, RemoteControl, RaspiState, ServoCalibState, NavArm, NavLocomotion, ScienceWeight #to access the UPDCAN protocol
 import rclpy
 from rclpy.node import Node
 from raspistatechecker import RaspiStateChecker
@@ -34,6 +34,10 @@ class RemoteComms(Node):
         self.cmd_arm_motion_pub = self.create_publisher(msg_type=Twist,topic="/cmd_move_arm",qos_profile=10)
         self.cmd_servo_calib_pub = self.create_publisher(msg_type=Float64MultiArray,topic="/wheel_controller/servo_calib_write",qos_profile=10)
         self.cmd_servo_calib_sub = self.create_subscription(msg_type=Float64MultiArray,topic="/wheel_controller/servo_calib_read",callback=self.sendCalibState,qos_profile=10)
+
+        self.odom_sub = self.create_subscription(Odometry, '/enc_odom', self.process_odom, 10)
+        self.motor_telem_sub = self.create_subscription(Float64MultiArray, '/wheel_controller/commands_telem', self.process_motor, 10)
+        self.arm_telem_sub = self.create_publisher(Float64MultiArray, '/arm_telem', self.process_arm, 10)
         #self.cmd_arm_grip_pub = self.create_publisher(msg_type=Bool,topic="/cmd_grip_arm",qos_profile=10)
         # self.odom_sub = self.create_subscription(msg_type=Odometry,topic="/odom",callback = self.rec_odom ,qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
         """The queue size has been set to 10 for now, but it can be changed as necessary"""
@@ -75,6 +79,15 @@ class RemoteComms(Node):
 
         self.servo_calib_handle = self.nh.getServoCalibState()
         self.servo_calib = ServoCalibState()
+
+        self.nav_arm_handle = self.nh.getNavArm()
+        self.nav_arm = NavArm()
+
+        self.nav_locomotion_handle = self.nh.getNavLocomotion()
+        self.nav_locomotion = NavLocomotion()
+
+        self.science_weight_handle = self.nh.getScienceWeight()
+        self.science_weight = ScienceWeight()
         
         self.e_stop = False #creating emergency stop attribute so that we know when that's been pressed
 
@@ -136,6 +149,26 @@ class RemoteComms(Node):
         calib.rr_calib = int(msg.data[3])
         self.servo_calib_handle.update(calib)
         self.nh.pushServoCalibState()
+
+    def process_odom(self, msg: Odometry):
+        self.nav_locomotion.odometry = (msg.pose.pose.position.x ** 2 + msg.pose.pose.position.y ** 2) ** 0.5
+
+    def process_motor(self, msg: Float64MultiArray):
+        self.nav_locomotion.motor_fl_target = msg.data[0]
+        self.nav_locomotion.motor_fr_target = msg.data[1]
+        self.nav_locomotion.motor_ml_target = msg.data[2]
+        self.nav_locomotion.motor_mr_target = msg.data[3]
+        self.nav_locomotion.motor_rl_target = msg.data[4]
+        self.nav_locomotion.motor_rr_target = msg.data[5]
+        self.nav_locomotion_handle.update(self.nav_locomotion)
+
+    def process_arm(self, msg: Float64MultiArray):
+        self.nav_arm.arm_active = self.arm_mode
+        self.nav_arm.joint_0 = msg.data[0]
+        self.nav_arm.joint_1 = msg.data[1]
+        self.nav_arm.joint_2 = msg.data[2]
+        self.nav_arm.joint_3 = msg.data[3]
+        self.nav_arm_handle.update(self.nav_arm)
 
     def remote_input(self):
         self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
@@ -343,42 +376,38 @@ class RemoteComms(Node):
         if direct:
             raise EmStop("EMERGENCY! Stopping...")
         
-    def send_telem(self):
-        telem_data = self.telem_sub.read() #get telemetry data from subscriber
+    # def send_telem(self):
+    #     telem_data = self.telem_sub.read() #get telemetry data from subscriber
+    # 
+    #     self.telemessage.variable = telem_data
+    #     self.telem_target.update(self.telemessage)
+    #     self.nh.pushTelemMessage()
+    #     self.nh.flush()
 
-        self.telemessage.variable = telem_data
-        self.telem_target.update(self.telemessage)
-        self.nh.pushTelemMessage()
-        self.nh.flush()
-
-    def rec_odom(self, odom_now):
-        self.x_pos = odom_now.pose.pose.position.x
-        self.y_pos = odom_now.pose.pose.position.y
-        self.z_pos = odom_now.pose.pose.position.z
-        self.orientation = odom_now.pose.pose.orientation
-
-        self.x_twist = odom_now.twist.twist.linear.x
-        self.z_twist = odom_now.twist.twist.angular.z
-
-        self.send_odom()
+    #def rec_odom(self, odom_now):
+    #    self.x_pos = odom_now.pose.pose.position.x
+    #    self.y_pos = odom_now.pose.pose.position.y
+    #    self.z_pos = odom_now.pose.pose.position.z
+    #    self.orientation = odom_now.pose.pose.orientation
+    #
+    #    self.x_twist = odom_now.twist.twist.linear.x
+    #    self.z_twist = odom_now.twist.twist.angular.z
+    #
+    #    self.send_odom()
     #will eventually combine these two methods, but keeping them separate for now for testing
-    def send_odom(self):
-        self.odomess.distance = np.sqrt(self.x_pos**2 + self.y_pos**2 + self.z_pos**2)
-        self.odomess.speed = self.x_twist
-
-        self.odomess.joint_0 = self.orientation.x
-        self.odomess.joint_1 = self.orientation.y
-        self.odomess.joint_2 = self.orientation.z
-        self.odomess.joint_3 = self.orientation.w
-
-        self.odom_wrap.update(self.odomess)
-        self.nh.pushNavOdometry()
-        
-        if self.rsc.poll(self.raspi):
-            self.raspihandle.update(self.raspi)
-            self.nh.pushRaspiState()
-
-        self.nh.flush()
+    # def send_odom(self):
+    #     self.odomess.distance = np.sqrt(self.x_pos**2 + self.y_pos**2 + self.z_pos**2)
+    #     self.odomess.speed = self.x_twist
+    #     self.odomess.joint_0 = self.orientation.x
+    #     self.odomess.joint_1 = self.orientation.y
+    #     self.odomess.joint_2 = self.orientation.z
+    #     self.odomess.joint_3 = self.orientation.w
+    #     self.odom_wrap.update(self.odomess)
+    #     self.nh.pushNavOdometry()
+    #     if self.rsc.poll(self.raspi):
+    #         self.raspihandle.update(self.raspi)
+    #         self.nh.pushRaspiState()
+    #     self.nh.flush()
 
 def main(args=None):
     rclpy.init(args=args)
