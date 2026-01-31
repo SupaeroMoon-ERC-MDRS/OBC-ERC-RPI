@@ -56,7 +56,7 @@ class ArucoPosePublisher(Node):
         self.marker_length = self.declare_parameter('marker_length', 0.15).value
 
         # need to be given the camera calib file, for matrix and distortion coefficients
-        calib_file = self.declare_parameter('camera_calib_file', 'camera_calibration.txt').value
+        calib_file = self.declare_parameter('camera_calib_file', 'camera_calib.yaml').value
        
         self.image_topic = self.declare_parameter('image_topic', '/camera/image_raw').value
         self.camera_frame = self.declare_parameter('camera_frame', 'camera_link').value
@@ -73,6 +73,9 @@ class ArucoPosePublisher(Node):
             
         self.mtx = np.array(cam_calib_dist['mtx'])
         self.dist = np.array(cam_calib_dist['dist'])
+
+        self.calib_width = 4608
+        self.calib_height = 2592
 
         # --- ArUco setup ---
         self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_100)
@@ -94,10 +97,28 @@ class ArucoPosePublisher(Node):
     def image_callback(self, msg: Image):
         # Convert ROS Image to OpenCV
         try:
-            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            raw_frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         except Exception as e:
             self.get_logger().error(f'CvBridge error: {e}')
             return
+        
+        frame = cv2.rotate(raw_frame, cv2.ROTATE_180)
+
+        h_stream, w_stream = frame.shape[:2]
+        scale_x = w_stream / self.calib_width
+        scale_y = h_stream / self.calib_height
+
+        current_mtx = np.copy(self.raw_mtx)
+        
+        # Scale Focal Lengths (fx, fy)
+        current_mtx[0, 0] *= scale_x  # fx
+        current_mtx[1, 1] *= scale_y  # fy
+        
+        # Scale & Flip Optical Center (cx, cy)
+        # Because we rotated 180, the "center" pixel moves to the other side
+        # New Center = Width - (Old_Center * Scale)
+        current_mtx[0, 2] = w_stream - (self.raw_mtx[0, 2] * scale_x)
+        current_mtx[1, 2] = h_stream - (self.raw_mtx[1, 2] * scale_y)
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -129,7 +150,7 @@ class ArucoPosePublisher(Node):
         rvecs, tvecs, _ = my_estimatePoseSingleMarkers(
             corners,
             self.marker_length,
-            self.mtx,
+            current_mtx,
             self.dist
         )
 
