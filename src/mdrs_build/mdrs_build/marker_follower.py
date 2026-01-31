@@ -14,7 +14,7 @@ class SimpleMarkerFollower(Node):
         super().__init__('simple_marker_follower')
 
         # Parameters
-        self.safe_follow_distance = 0.4
+        self.safe_follow_distance = 0.6 # Change again post testing
         self.max_linear_vel = 5.0
         self.max_angular_vel = 10.0
         
