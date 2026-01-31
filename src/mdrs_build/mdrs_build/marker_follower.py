@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Twist
 import math
-
+import time
 class SimpleMarkerFollower(Node):
     """
     A lightweight marker follower that does NOT use Nav2.
@@ -106,10 +106,18 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        # 1. Create the Stop Command
         twist = Twist()
         twist.linear.x = 0.0
         twist.angular.z = 0.0
-        node.pub_vel.publish(twist)
+        
+        # 2. Publish it multiple times just to be safe
+        node.get_logger().info("Sending STOP command...")
+        for _ in range(3):
+            node.pub_vel.publish(twist)
+            time.sleep(0.1)  # <--- THE FIX: Wait for it to send
+        
+        # 3. NOW you can shut down
         node.destroy_node()
         rclpy.shutdown()
 
