@@ -111,8 +111,8 @@ class ArucoPosePublisher(Node):
         current_mtx = np.copy(self.mtx)
         
         # Scale Focal Lengths (fx, fy)
-        current_mtx[0, 0] = 2000 * scale_x # fx
-        current_mtx[1, 1] = 2000 * scale_y # fy
+        current_mtx[0, 0] = 2500 * scale_x # fx
+        current_mtx[1, 1] = 2500 * scale_y # fy
         
         # Scale & Flip Optical Center (cx, cy)
         # Because we rotated 180, the "center" pixel moves to the other side
