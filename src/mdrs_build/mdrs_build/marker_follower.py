@@ -78,6 +78,7 @@ class SimpleMarkerFollower(Node):
 
         self.target_linear = lin_cmd
         self.target_angular = ang_cmd
+        self.get_logger().info(f'Computed target linear: {lin_cmd}, angular: {ang_cmd}')
 
     def control_loop(self):
         """
