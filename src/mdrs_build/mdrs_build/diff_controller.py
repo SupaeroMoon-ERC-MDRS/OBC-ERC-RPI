@@ -46,7 +46,7 @@ class DifferentialDriveController(Node):
 
     def publish_wheel_commands(self):
         wheel_msg = Float64MultiArray()
-        wheel_msg.data = [self.lf, self.rf/1.25, self.lr/1.8, self.rr/1.03, self.lm, self.rm*0] #swap rf and rr once wiring is fixed
+        wheel_msg.data = [self.lf, self.rf/1.25, self.lr/1.8, self.rr/1.03, self.lm, self.rm] #swap rf and rr once wiring is fixed
         self.motor_wheel_pub.publish(wheel_msg)
 
     def calculate_wheel_speeds(self, base_speed, angular_velocity):
