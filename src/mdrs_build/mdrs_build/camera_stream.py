@@ -32,7 +32,7 @@ class UdpCamera(Node):
             
             if ret:
                 # Success - Publish the image
-                self.get_logger().info("Received frame")
+                # self.get_logger().info("Received frame")
 
                 msg = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
                 msg.header.stamp = self.get_clock().now().to_msg()
