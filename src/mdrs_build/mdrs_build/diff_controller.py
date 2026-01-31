@@ -33,7 +33,7 @@ class DifferentialDriveController(Node):
         self.last_time = self.get_clock().now()
 
     def cmd_vel_callback(self, msg):
-        linear_velocity = -msg.linear.x
+        linear_velocity = msg.linear.x
         angular_velocity = msg.angular.z
 
         self.lf, self.lm, self.lr, self.rf, self.rm, self.rr = self.calculate_wheel_speeds(linear_velocity, angular_velocity)
