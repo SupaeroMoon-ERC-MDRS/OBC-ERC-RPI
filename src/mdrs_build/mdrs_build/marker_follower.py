@@ -77,7 +77,7 @@ class SimpleMarkerFollower(Node):
         ang_cmd = max(min(ang_cmd, self.max_angular_vel), -self.max_angular_vel)
 
         self.target_linear = lin_cmd
-        self.target_angular = ang_cmd
+        self.target_angular = -ang_cmd # to make left and right correct
         self.get_logger().info(f'Computed target linear: {lin_cmd}, angular: {ang_cmd}')
 
     def control_loop(self):
