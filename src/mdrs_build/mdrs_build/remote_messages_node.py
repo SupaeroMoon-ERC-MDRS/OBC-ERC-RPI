@@ -161,6 +161,7 @@ class RemoteComms(Node):
         self.nav_locomotion.motor_rl_target = msg.data[4]
         self.nav_locomotion.motor_rr_target = msg.data[5]
         self.nav_locomotion_handle.update(self.nav_locomotion)
+        self.nh.pushNavLocomotion()
 
     def process_arm(self, msg: Float64MultiArray):
         self.nav_arm.arm_active = self.arm_mode
@@ -169,6 +170,7 @@ class RemoteComms(Node):
         self.nav_arm.joint_2 = msg.data[2]
         self.nav_arm.joint_3 = msg.data[3]
         self.nav_arm_handle.update(self.nav_arm)
+        self.nh.pushNavArm()
 
     def remote_input(self):
         self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
