@@ -15,7 +15,7 @@ class SimpleMarkerFollower(Node):
 
         # Parameters
         self.safe_follow_distance = 0.8
-        self.max_linear_vel = 1.0
+        self.max_linear_vel = 5.0
         self.max_angular_vel = 10.0
         
         # Gains for the proportional controller
