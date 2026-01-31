@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from build.sim_mdrs.build.lib.sim_mdrs.roboclaw_node import msg
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Twist
@@ -52,15 +53,14 @@ class SimpleMarkerFollower(Node):
         
         # 1. Get Forward Distance (Camera Z)
         # We subtract safe_follow_distance from Z
-        forward_dist = msg.pose.position.z 
+        forward_dist = msg.pose.position.x
         dist_error = forward_dist - self.safe_follow_distance
 
         # 2. Get Lateral Error (Robot Y is Camera -X)
-        lateral_offset = -msg.pose.position.x
-        
+        lateral_error = msg.pose.position.y      
         # 3. Calculate Angle to Marker (Yaw)
         # atan2(Y, X) -> atan2(Left, Forward)
-        angle_error = math.atan2(lateral_offset, forward_dist)
+        angle_error = math.atan2(lateral_error, forward_dist)
 
         # --- CONTROL LOGIC (Point & Shoot) ---
         heading_tolerance = 0.1 # Radians
