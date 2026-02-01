@@ -52,7 +52,7 @@ class IKServoController(Node):
         self.go_straight()
         self.base_curr = 90.0
         self.theta_1_curr = 135.0
-        self.theta_2_curr = 135.0
+        self.theta_2_curr = 105.0
         self.gripper_curr = 90.0
 
         self.go_home()
@@ -175,7 +175,7 @@ class IKServoController(Node):
             self.theta_2_curr = q2_deg
 
             theta_1_servo = 270 - (135 - 90 + q1_deg)
-            theta_2_servo = 120 + q2_deg
+            theta_2_servo = 105 + q2_deg
 
             self.get_logger().info(f"Computed angles: theta_1={q1_deg:.1f}, theta_2={q2_deg:.1f}")
             self.get_logger().info(f"Setting angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
@@ -220,16 +220,16 @@ class IKServoController(Node):
         self.get_logger().info("Returning to straight position.")
         self.send_to_servo(90.0, self.base)
         self.send_to_servo(135.0, self.theta_1)
-        self.send_to_servo(120.0, self.theta_2)
+        self.send_to_servo(105.0, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
 
         self.theta_1_curr = 135.0
-        self.theta_2_curr = 120.0
+        self.theta_2_curr = 105.0
         self.base_curr = 90.0
         self.gripper_curr = 90.0
 
         msg = Float64MultiArray()
-        msg.data = [90.0, 135.0, 120.0, 90.0]
+        msg.data = [90.0, 135.0, 105.0, 90.0]
         self.telem_pub.publish(msg)
 
     def go_scale(self):
