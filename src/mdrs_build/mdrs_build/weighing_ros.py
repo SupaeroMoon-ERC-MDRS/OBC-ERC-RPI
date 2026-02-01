@@ -9,7 +9,7 @@ from hx711 import HX711
 class WeightPublisher(Node):
     def __init__(self):
         super().__init__('weight_publisher')
-        self.publisher_ = self.create_publisher(UInt16MultiArray, 'weight', 10)
+        self.publisher_ = self.create_publisher(UInt16MultiArray, '/science_scale', 10)
         self.timer = self.create_timer(1, self.timer_callback)  # 2 Hz
         
         # Setup HX711
