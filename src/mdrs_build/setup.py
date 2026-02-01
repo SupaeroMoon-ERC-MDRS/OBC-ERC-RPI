@@ -18,6 +18,7 @@ setup(
         (os.path.join('lib', package_name), glob('mdrs_build/raspistatechecker.py')),
         (os.path.join('lib', package_name), glob('mdrs_build/udpcanpy*')),
         (os.path.join('lib', package_name), glob('mdrs_build/comms.dbc')),
+        (os.path.join('lib', package_name), glob('mdrs_build/hx711.py')),
         (os.path.join('share', package_name, 'config'), glob('config/*')),
 
 
