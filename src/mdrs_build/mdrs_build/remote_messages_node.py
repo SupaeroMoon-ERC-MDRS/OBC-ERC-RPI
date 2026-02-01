@@ -195,7 +195,7 @@ class RemoteComms(Node):
         self.pushed["loco"] = True
 
     def process_arm(self, msg: Float64MultiArray):
-        self.nav_arm.arm_active = self.arm_mode
+        self.nav_arm.arm_active = 1 if self.arm_mode else 0
         self.nav_arm.joint_0 = msg.data[0]
         self.nav_arm.joint_1 = msg.data[1]
         self.nav_arm.joint_2 = msg.data[2]
