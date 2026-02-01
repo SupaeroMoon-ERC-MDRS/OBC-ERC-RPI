@@ -105,23 +105,9 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        print("Sending STOP command via CLI...")
-        # This runs the exact command you would type in the terminal
-        # It spins up a separate process, sends the message once, and exits.
-        subprocess.run([
-            'ros2', 'topic', 'pub', '--once', 
-            '/cmd_vel', 
-            'geometry_msgs/msg/Twist', 
-            '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
-        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # Suppress output to keep terminal clean
-        time.sleep(1)
+        pass
     finally:
-
-        # Now clean up
-        try:
-            node.destroy_node()
-        except:
-            pass
+        node.destroy_node()
         rclpy.shutdown()
 
 if __name__ == '__main__':
