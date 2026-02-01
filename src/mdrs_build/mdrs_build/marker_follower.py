@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Twist
 import math
-import time
+import subprocess
 class SimpleMarkerFollower(Node):
     """
     A lightweight marker follower that does NOT use Nav2.
@@ -106,19 +106,21 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        # 1. Create the Stop Command
-        twist = Twist()
-        twist.linear.x = 0.0
-        twist.angular.z = 0.0
-        
-        # 2. Publish it multiple times just to be safe
-        node.get_logger().info("Sending STOP command...")
-        for _ in range(3):
-            node.pub_vel.publish(twist)
-            time.sleep(0.1)  # <--- THE FIX: Wait for it to send
-        
-        # 3. NOW you can shut down
-        node.destroy_node()
+        print("Sending STOP command via CLI...")
+        # This runs the exact command you would type in the terminal
+        # It spins up a separate process, sends the message once, and exits.
+        subprocess.run([
+            'ros2', 'topic', 'pub', '--once', 
+            '/cmd_vel', 
+            'geometry_msgs/msg/Twist', 
+            '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # Suppress output to keep terminal clean
+
+        # Now clean up
+        try:
+            node.destroy_node()
+        except:
+            pass
         rclpy.shutdown()
 
 if __name__ == '__main__':
