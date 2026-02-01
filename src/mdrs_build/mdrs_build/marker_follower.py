@@ -4,6 +4,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Twist
 import math
 import subprocess
+import time
 class SimpleMarkerFollower(Node):
     """
     A lightweight marker follower that does NOT use Nav2.
@@ -85,18 +86,24 @@ class SimpleMarkerFollower(Node):
         Publishes the latest calculated velocity, or stops if marker is lost.
         """
         # Check timeout (e.g. 0.5 seconds without marker)
-        if (self.get_clock().now() - self.last_marker_time).nanoseconds > 0.5 * 1e9:
+        if ((self.get_clock().now() - self.last_marker_time).nanoseconds > 0.5 * 1e9) and self.marker_visible:
             self.marker_visible = False
             self.target_linear = 0.0
             self.target_angular = 0.0
             # Optional: print once that we lost the marker
             self.get_logger().info('Marker lost, stopping...', throttle_duration_sec=2.0)
+            # Publish command
+            twist = Twist()
+            twist.linear.x = float(self.target_linear)
+            twist.angular.z = float(self.target_angular)
+            self.pub_vel.publish(twist)
 
-        # Publish command
-        twist = Twist()
-        twist.linear.x = float(self.target_linear)
-        twist.angular.z = float(self.target_angular)
-        self.pub_vel.publish(twist)
+        if self.marker_visible:
+            # Publish command
+            twist = Twist()
+            twist.linear.x = float(self.target_linear)
+            twist.angular.z = float(self.target_angular)
+            self.pub_vel.publish(twist)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -106,21 +113,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        print("Sending STOP command via CLI...")
-        # This runs the exact command you would type in the terminal
-        # It spins up a separate process, sends the message once, and exits.
-        subprocess.run([
-            'ros2', 'topic', 'pub', '--once', 
-            '/cmd_vel', 
-            'geometry_msgs/msg/Twist', 
-            '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
-        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # Suppress output to keep terminal clean
-
-        # Now clean up
-        try:
-            node.destroy_node()
-        except:
-            pass
+        node.destroy_node()
         rclpy.shutdown()
 
 if __name__ == '__main__':

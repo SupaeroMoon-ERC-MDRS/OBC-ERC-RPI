@@ -39,28 +39,39 @@ class IKServoController(Node):
             10
         )
         
-        self.get_logger().info("Straightening Arm")
-        self.go_home()
+
         # Arm lengths
         self.l1 = 0.11059
         self.l2 = 0.18052
         self.l3 = 0.16994
-
-        self.get_logger().info("Going to Startup position")
         self.total_reach = self.l2 + self.l3 # 0.51012
-        self.current_x = 0.0
-        self.current_y = self.total_reach - 0.05
-        theta_1, theta_2 = self.compute_ik(dir='up')
 
+        self.current_x = 0
+        self.current_y = self.total_reach
+
+        self.go_straight()
         self.base_curr = 90.0
-        self.theta_1_curr = theta_1
-        self.theta_2_curr = theta_2
+        self.theta_1_curr = 135.0
+        self.theta_2_curr = 105.0
         self.gripper_curr = 90.0
+
+        self.go_home()
 
         self.get_logger().info("IK Servo Controller node started.")
 
     def cmd_callback(self, msg):
+        # First, check for specific commands
+        # Go home
+        if abs(msg.angular.y) > 1e-4:
+            self.go_home()
+            return None
 
+        # Go to container
+        if abs(msg.angular.z) > 1e-4:
+            self.go_scale()
+            return None
+
+        
         # Case 1: arm fwd/bkwd
         if abs(msg.linear.x) > 1e-4 and abs(msg.linear.y) < 1e-4:
             dz = msg.linear.x
@@ -164,7 +175,7 @@ class IKServoController(Node):
             self.theta_2_curr = q2_deg
 
             theta_1_servo = 270 - (135 - 90 + q1_deg)
-            theta_2_servo = 135 + q2_deg
+            theta_2_servo = 105 + q2_deg
 
             self.get_logger().info(f"Computed angles: theta_1={q1_deg:.1f}, theta_2={q2_deg:.1f}")
             self.get_logger().info(f"Setting angles: theta_1={theta_1_servo:.1f}, theta_2={theta_2_servo:.1f}")
@@ -191,16 +202,49 @@ class IKServoController(Node):
 
     def go_home(self):
         self.get_logger().info("Returning to home position.")
+        self.current_x = 0.0
+        self.current_y = self.total_reach - 0.05
+        theta_1, theta_2 = self.compute_ik(dir='up')
         self.send_to_servo(90.0, self.base)
-        self.send_to_servo(135.0, self.theta_1)
-        self.send_to_servo(135.0, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
+        self.theta_1_curr = theta_1
+        self.theta_2_curr = theta_2
+        self.base_curr = 90.0
+        self.gripper_curr = 90.0
 
         msg = Float64MultiArray()
-        msg.data = [90.0, 135.0, 135.0, 90.0]
+        msg.data = [90.0, theta_1, theta_2, 90.0]
         self.telem_pub.publish(msg)
 
-    
+    def go_straight(self):
+        self.get_logger().info("Returning to straight position.")
+        self.send_to_servo(90.0, self.base)
+        self.send_to_servo(135.0, self.theta_1)
+        self.send_to_servo(105.0, self.theta_2)
+        self.send_to_servo(90.0, self.gripper)
+
+        self.theta_1_curr = 135.0
+        self.theta_2_curr = 105.0
+        self.base_curr = 90.0
+        self.gripper_curr = 90.0
+
+        msg = Float64MultiArray()
+        msg.data = [90.0, 135.0, 105.0, 90.0]
+        self.telem_pub.publish(msg)
+
+    def go_scale(self):
+        self.get_logger().info("Going to scale")
+        self.send_to_servo(45.0, self.base)
+        self.send_to_servo(108.3, self.theta_1)
+        self.send_to_servo(254.2, self.theta_2)
+        self.send_to_servo(90.0, self.gripper)
+        # theta_1=108.3, theta_2=254.2 base 45 102.5
+
+        msg = Float64MultiArray()
+        msg.data = [45.0, 108.3, 254.2, 90.0]
+        self.telem_pub.publish(msg)
+
+
 def main(args=None):
     rclpy.init(args=args)
     inv_kin = IKServoController()
@@ -209,7 +253,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        inv_kin.go_home()
+        inv_kin.go_straight()
         inv_kin.destroy_node()
         rclpy.shutdown()
 
