@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import UInt16MultiArray
-from hx711py.hx711 import HX711
+from hx711 import HX711
 
 
 class WeightPublisher(Node):
