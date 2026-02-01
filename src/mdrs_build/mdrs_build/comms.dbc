@@ -63,5 +63,5 @@ BO_ 41 NavArm: 5
   SG_ joint_3 : 28|9@1+ (0.705,0) [0|360] "°"
   
 BO_ 70 ScienceWeight: 2
-  SG_ scale_meas : 0|15@1+ (0.0152587890625,0) [0|500] "g"
+  SG_ scale_meas : 0|15@1+ (1,0) [0|500] "g"
   SG_ scale_valid : 15|1@1+ (1,0) [0|1] ""
