@@ -43,6 +43,7 @@ setup(
             'marker_follower = mdrs_build.marker_follower:main',
             'stereo_camera = mdrs_build.stereo_camera:main',
             'camera_stream = mdrs_build.camera_stream:main',
+            'weighing_ros = mdrs_build.weighing_ros:main'
         ],
     },
 )

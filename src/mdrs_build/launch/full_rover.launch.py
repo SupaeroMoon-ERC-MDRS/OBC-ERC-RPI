@@ -33,8 +33,14 @@ def generate_launch_description():
             executable='remote_messages_node',
             name='remote_messages_node',
             output='screen'
-        )
+        ),
 
+        Node(
+            package='mdrs_build',
+            executable='weighing_ros',
+            name='weighing_ros',
+            output='screen'
+        )
         # Backup in case remote not available
         # Node(
         #     package='mdrs_build',
