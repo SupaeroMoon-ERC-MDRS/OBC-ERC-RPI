@@ -155,7 +155,7 @@ class RemoteComms(Node):
             self.nh.pushNavLocomotion()
         
         if not self.pushed["arm"]:
-            self.nav_arm.arm_active = self.arm_mode
+            self.nav_arm.arm_active = 1 if self.arm_mode else 0
             self.nav_arm_handle.update(self.nav_arm)
             self.nh.pushNavArm()
 
