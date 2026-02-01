@@ -86,7 +86,7 @@ class SimpleMarkerFollower(Node):
         Publishes the latest calculated velocity, or stops if marker is lost.
         """
         # Check timeout (e.g. 0.5 seconds without marker)
-        if (self.get_clock().now() - self.last_marker_time).nanoseconds > 0.5 * 1e9:
+        if ((self.get_clock().now() - self.last_marker_time).nanoseconds > 0.5 * 1e9) and (self.marker_visible):
             self.marker_visible = False
             self.target_linear = 0.0
             self.target_angular = 0.0
