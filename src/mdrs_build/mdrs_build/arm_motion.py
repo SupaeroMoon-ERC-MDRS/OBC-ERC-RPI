@@ -234,14 +234,14 @@ class IKServoController(Node):
 
     def go_scale(self):
         self.get_logger().info("Going to scale")
-        self.send_to_servo(102.5, self.base)
+        self.send_to_servo(45.0, self.base)
         self.send_to_servo(108.3, self.theta_1)
         self.send_to_servo(254.2, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
         # theta_1=108.3, theta_2=254.2 base 45 102.5
 
         msg = Float64MultiArray()
-        msg.data = [102.5, 108.3, 254.2, 90.0]
+        msg.data = [45.0, 108.3, 254.2, 90.0]
         self.telem_pub.publish(msg)
 
 
