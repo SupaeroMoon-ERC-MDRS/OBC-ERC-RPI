@@ -26,7 +26,7 @@ for i in range(num_samples):
 
 # Remove outliers (simple method: remove top and bottom 20%)
 samples.sort()
-clean_samples = samples[3:-3]  # Remove 3 highest and 3 lowest
+clean_samples = samples[10:-10]  # Remove 3 highest and 3 lowest
 
 # Calculate reference unit
 average = sum(clean_samples) / len(clean_samples)
