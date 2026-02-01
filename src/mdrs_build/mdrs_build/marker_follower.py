@@ -4,6 +4,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Twist
 import math
 import subprocess
+import time
 class SimpleMarkerFollower(Node):
     """
     A lightweight marker follower that does NOT use Nav2.
@@ -104,8 +105,6 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        pass
-    finally:
         print("Sending STOP command via CLI...")
         # This runs the exact command you would type in the terminal
         # It spins up a separate process, sends the message once, and exits.
@@ -115,6 +114,8 @@ def main(args=None):
             'geometry_msgs/msg/Twist', 
             '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # Suppress output to keep terminal clean
+        time.sleep(1)
+    finally:
 
         # Now clean up
         try:
