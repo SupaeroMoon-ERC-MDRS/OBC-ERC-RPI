@@ -157,7 +157,7 @@ class RemoteComms(Node):
         if not self.pushed["arm"]:
             self.nav_arm.arm_active = 1 if self.arm_mode else 0
             self.nav_arm_handle.update(self.nav_arm)
-            # self.nh.pushNavArm()
+            self.nh.pushNavArm()
 
         self.flushClear()
 
@@ -203,7 +203,7 @@ class RemoteComms(Node):
         if self.pushed["arm"]:
             self.flushClear()
         self.nav_arm_handle.update(self.nav_arm)
-        # self.nh.pushNavArm()
+        self.nh.pushNavArm()
         self.pushed["arm"] = True
 
     def remote_input(self):
