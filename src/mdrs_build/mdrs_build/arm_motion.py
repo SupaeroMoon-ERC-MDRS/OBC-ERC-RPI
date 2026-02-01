@@ -238,6 +238,7 @@ class IKServoController(Node):
         self.send_to_servo(135.0, self.theta_1)
         self.send_to_servo(135.0, self.theta_2)
         self.send_to_servo(90.0, self.gripper)
+        # theta_1=108.3, theta_2=254.2 base 45 102.5
 
         msg = Float64MultiArray()
         msg.data = [90.0, 135.0, 135.0, 90.0]
@@ -252,7 +253,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        inv_kin.go_home()
+        inv_kin.go_straight()
         inv_kin.destroy_node()
         rclpy.shutdown()
 
