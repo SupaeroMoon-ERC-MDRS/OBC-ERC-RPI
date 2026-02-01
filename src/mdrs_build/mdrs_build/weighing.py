@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 from hx711 import HX711
 
 # Setup HX711
-hx = HX711(13, 19)
+hx = HX711(16, 20)
 hx.set_reading_format("MSB", "MSB")
 hx.set_reference_unit(417.47)  # Use your calculated reference unit here
 hx.reset()
