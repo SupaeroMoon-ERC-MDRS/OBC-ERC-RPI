@@ -373,6 +373,8 @@ class RemoteComms(Node):
         self.lin_y = 0.0 #up/down
         self.base = 0.0 #gripper open/close
         self.end_grip = 0.0 #wrist rotation
+        self.go_home = 0.0
+        self.go_scale = 0.0
 
         self.lin_x = self.thumb_curve(self.ThumbLX, self.ThumbDeadZone_arm) * self.max_servo_lin
         self.lin_y = -self.thumb_curve(self.ThumbLY, self.ThumbDeadZone_arm) * self.max_servo_lin
@@ -384,6 +386,11 @@ class RemoteComms(Node):
             self.end_grip = -1.0
         elif self.LT: # grip close
             self.end_grip = 1.0
+        if self.RT:
+            self.go_home = 1.0
+        if self.RL:
+            self.go_scale = 1.0
+
 
         #print to debug
         if self.lin_x != 0.0 or self.lin_y != 0.0 or self.base != 0.0 or self.end_grip != 0.0:
@@ -393,8 +400,8 @@ class RemoteComms(Node):
         arm_cmd.linear.y = self.lin_y
         arm_cmd.linear.z = self.end_grip
         arm_cmd.angular.x = self.base
-        arm_cmd.angular.y = 0.0
-        arm_cmd.angular.z = 0.0
+        arm_cmd.angular.y = self.go_home
+        arm_cmd.angular.z = self.go_scale
         self.cmd_arm_motion_pub.publish(arm_cmd)
         return
 
