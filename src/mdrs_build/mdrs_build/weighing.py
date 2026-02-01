@@ -8,7 +8,7 @@ hx.set_reading_format("MSB", "MSB")
 ref = float(input("Please give reference unit : "))
 hx.set_reference_unit(ref)  # Use your calculated reference unit here
 hx.reset()
-hx.tare()
+hx.tare(200)
 
 print("Scale ready! Place items to weigh...")
 print("Press Ctrl+C to exit")

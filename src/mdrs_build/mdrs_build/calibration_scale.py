@@ -10,7 +10,7 @@ hx.reset()
 hx.tare()
 
 # Configuration
-num_samples = 40
+num_samples = 200
 
 print(f"Place known weight on scale and enter it's weight in grams:",end="")
 known_weight = int(input())
