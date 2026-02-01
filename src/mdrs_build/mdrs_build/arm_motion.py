@@ -33,7 +33,6 @@ class IKServoController(Node):
         self.total_reach = self.l2 + self.l3 # 0.51012
         self.current_x = 0.0
         self.current_y = self.total_reach - 0.05
-        self.go_home()
         theta_1, theta_2 = self.compute_ik(dir='up')
 
         self.base_curr = 90.0
@@ -55,6 +54,7 @@ class IKServoController(Node):
             '/arm_telem',
             10
         )
+        self.go_home()
 
         self.get_logger().info("IK Servo Controller node started.")
 
