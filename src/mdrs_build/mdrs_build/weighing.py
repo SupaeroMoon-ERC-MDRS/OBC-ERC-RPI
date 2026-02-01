@@ -15,7 +15,7 @@ print("Press Ctrl+C to exit")
 
 try:
     while True:
-        weight = hx.get_weight(10)  # Average of 3 readings
+        weight = hx.get_weight(11)  # Average of 3 readings
         print(f"Weight: {weight:.1f}g")
         
         hx.power_down()
