@@ -23,22 +23,6 @@ class IKServoController(Node):
         self.theta_1 = servo.Servo(self.pca.channels[1], actuation_range=270, min_pulse=500, max_pulse=2500)
         self.theta_2 = servo.Servo(self.pca.channels[2], actuation_range=270, min_pulse=500, max_pulse=2500)
         self.gripper = servo.Servo(self.pca.channels[3], actuation_range=270, min_pulse=500, max_pulse=2500)
-        
-        self.get_logger().info("Homing Arm")
-        # Arm lengths
-        self.l1 = 0.11059
-        self.l2 = 0.18052
-        self.l3 = 0.16994
-
-        self.total_reach = self.l2 + self.l3 # 0.51012
-        self.current_x = 0.0
-        self.current_y = self.total_reach - 0.05
-        theta_1, theta_2 = self.compute_ik(dir='up')
-
-        self.base_curr = 90.0
-        self.theta_1_curr = theta_1
-        self.theta_2_curr = theta_2
-        self.gripper_curr = 90.0
 
         self.servo_telem = [None, None, None, None]
 
@@ -54,7 +38,24 @@ class IKServoController(Node):
             '/arm_telem',
             10
         )
+        
+        self.get_logger().info("Straightening Arm")
         self.go_home()
+        # Arm lengths
+        self.l1 = 0.11059
+        self.l2 = 0.18052
+        self.l3 = 0.16994
+
+        self.get_logger().info("Going to Startup position")
+        self.total_reach = self.l2 + self.l3 # 0.51012
+        self.current_x = 0.0
+        self.current_y = self.total_reach - 0.05
+        theta_1, theta_2 = self.compute_ik(dir='up')
+
+        self.base_curr = 90.0
+        self.theta_1_curr = theta_1
+        self.theta_2_curr = theta_2
+        self.gripper_curr = 90.0
 
         self.get_logger().info("IK Servo Controller node started.")
 
