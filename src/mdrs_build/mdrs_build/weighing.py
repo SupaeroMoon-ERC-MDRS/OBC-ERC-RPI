@@ -5,7 +5,7 @@ from hx711 import HX711
 # Setup HX711
 hx = HX711(16, 20)
 hx.set_reading_format("MSB", "MSB")
-hx.set_reference_unit(417.47)  # Use your calculated reference unit here
+hx.set_reference_unit(406.84)  # Use your calculated reference unit here
 hx.reset()
 hx.tare()
 
