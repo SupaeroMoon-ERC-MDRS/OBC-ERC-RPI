@@ -24,7 +24,7 @@ class IKServoController(Node):
         self.theta_2 = servo.Servo(self.pca.channels[2], actuation_range=270, min_pulse=500, max_pulse=2500)
         self.gripper = servo.Servo(self.pca.channels[3], actuation_range=270, min_pulse=500, max_pulse=2500)
 
-        self.servo_telem = [None, None, None, None]
+        self.servo_telem = [0, 0, 0, 0]
 
         self.subscription = self.create_subscription(
             Twist,
@@ -137,7 +137,12 @@ class IKServoController(Node):
             # self.get_logger().info("No arm movement command received.")
 
         msg = Float64MultiArray()
-        msg.data = self.servo_telem
+        msg.data = [
+            float(self.servo_telem[0]),
+            float(self.servo_telem[1]),
+            float(self.servo_telem[2]),
+            float(self.servo_telem[3])
+        ]
         self.telem_pub.publish(msg)
 
 
