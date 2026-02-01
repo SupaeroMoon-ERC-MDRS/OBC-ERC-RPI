@@ -5,7 +5,7 @@ import rclpy
 from rclpy.node import Node
 from raspistatechecker import RaspiStateChecker
 
-from std_msgs.msg import Float64, Bool, Float64MultiArray
+from std_msgs.msg import Float64, Bool, Float64MultiArray, UInt16MultiArray
 from geometry_msgs.msg import Twist, Quaternion
 from nav_msgs.msg import Odometry
 import numpy as np
@@ -38,6 +38,7 @@ class RemoteComms(Node):
         self.odom_sub = self.create_subscription(Odometry, '/enc_odom', self.process_odom, 10)
         self.motor_telem_sub = self.create_subscription(Float64MultiArray, '/wheel_controller/commands_telem', self.process_motor, 10)
         self.arm_telem_sub = self.create_subscription(Float64MultiArray, '/arm_telem', self.process_arm, 10)
+        self.scale_telem_sub = self.create_subscription(UInt16MultiArray, '/science_scale', self.process_scale, 10)
         #self.cmd_arm_grip_pub = self.create_publisher(msg_type=Bool,topic="/cmd_grip_arm",qos_profile=10)
         # self.odom_sub = self.create_subscription(msg_type=Odometry,topic="/odom",callback = self.rec_odom ,qos_profile=10) #probably will need many telemetry topics #create callback func for subscription
         """The queue size has been set to 10 for now, but it can be changed as necessary"""
@@ -139,6 +140,7 @@ class RemoteComms(Node):
             "raspi": False,
             "loco": False,
             "arm": False,
+            "scale": False
         }
 
     def flushClear(self):
@@ -147,6 +149,7 @@ class RemoteComms(Node):
             "raspi": False,
             "loco": False,
             "arm": False,
+            "scale": False
         }
 
     def flushall(self):
@@ -158,6 +161,9 @@ class RemoteComms(Node):
             self.nav_arm.arm_active = 1 if self.arm_mode else 0
             self.nav_arm_handle.update(self.nav_arm)
             self.nh.pushNavArm()
+
+        if not self.pushed["scale"]:
+            self.nh.pushScienceWeight()
 
         self.flushClear()
 
@@ -205,6 +211,15 @@ class RemoteComms(Node):
         self.nav_arm_handle.update(self.nav_arm)
         self.nh.pushNavArm()
         self.pushed["arm"] = True
+
+    def process_scale(self, msg: UInt16MultiArray):
+        self.science_weight.scale_meas = msg.data[0]
+        self.science_weight.scale_valid = 1 if msg.data[1] else 0
+        if self.pushed["scale"]:
+            self.flushClear()
+        self.science_weight_handle.update(self.science_weight)
+        self.nh.pushScienceWeight()
+        self.pushed["scale"] = True
 
     def remote_input(self):
         self.res = self.remote.access(self.data) #accesses message within remote and puts it into the data object (RemoteControl object)
