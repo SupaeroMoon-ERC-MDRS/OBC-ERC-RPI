@@ -92,12 +92,17 @@ class SimpleMarkerFollower(Node):
             self.target_angular = 0.0
             # Optional: print once that we lost the marker
             self.get_logger().info('Marker lost, stopping...', throttle_duration_sec=2.0)
-
-        # Publish command
-        twist = Twist()
-        twist.linear.x = float(self.target_linear)
-        twist.angular.z = float(self.target_angular)
-        self.pub_vel.publish(twist)
+            # Publish command
+            twist = Twist()
+            twist.linear.x = float(self.target_linear)
+            twist.angular.z = float(self.target_angular)
+            self.pub_vel.publish(twist)
+        else:
+            # Publish command
+            twist = Twist()
+            twist.linear.x = float(self.target_linear)
+            twist.angular.z = float(self.target_angular)
+            self.pub_vel.publish(twist)
 
 def main(args=None):
     rclpy.init(args=args)
